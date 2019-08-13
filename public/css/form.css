@@ -48,9 +48,24 @@ a {
     color: dodgerblue;
 }
 
-.signin {
+.login-box {
+    display: flex;
     background-color: #f1f1f1;
-    text-align: center;
+    align-content: center;
+    justify-content: space-between;
+    width: 70vw;
+    opacity: 0.9;
+    text-transform: uppercase;
+}
+
+.login-box_link {
+    font-size: 0.8rem;
+    text-decoration: none;
+    color: black;
+}
+
+.login-box_link:hover {
+    color: #89b927;
 }
 
 form {

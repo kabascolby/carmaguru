@@ -1,4 +1,4 @@
-const path = require('path');
+// const path = require('path');
 const express = require('express');
 
 const mainPath = require('../utility/path');
@@ -7,7 +7,10 @@ const router = express.Router();
 const users = [];
 
 router.get('/signIn', (req, res, next) => {
-    res.sendFile(path.join(mainPath, 'views', 'signIn.html'))
+    res.render('signIn', {
+        pageTitle: 'SignIn',
+        pagePath: '/api/singIn/'
+    })
 });
 
 router.post('/signIn', (req, res, next) => {

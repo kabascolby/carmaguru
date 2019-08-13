@@ -1,0 +1,22 @@
+<%- include('includes/start') %>
+    <link rel="stylesheet" href="/css/form.css">
+
+    </head>
+
+    <body>
+        <%-include('includes/navigation') %>
+            <div class="content">
+                <form action="/api/login" method="POST">
+                    <label for="username"><b>Username</b></label>
+                    <input type="text" placeholder="Enter your username" name="username"><br>
+                    <label for="psw"><b>Password</b></label>
+                    <input type="password" placeholder="Enter Password" name="psw" required>
+                    <hr>
+                    <input type="submit" name="submit" class="registerbtn" value="OK">
+					<div class="content login-box">
+                        <a href="/api/signIn" class="login-box_link">I forgot my password</a>
+                        <a href="/api/signIn" class="login-box_link">Sign In</a>
+					</div>
+                </form>
+            </div>
+            <%-include('includes/end')%>

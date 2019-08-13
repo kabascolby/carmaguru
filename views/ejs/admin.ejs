@@ -1,0 +1,13 @@
+<%-include('includes/start')%>
+    </head>
+    <%-include('includes/navigation')%>
+<body>
+	<ul> 
+	<% for (let user in users) { %>
+		<li><p>Name:<%=users[user].first%> - <%=users[user].last%></p>
+			<p><%=users[user].username%></p>
+			<p><%=users[user].username%></p>
+		</li>
+	<% } %>
+	</ul>
+	<%-include('includes/end')%>
