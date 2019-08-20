@@ -1,15 +1,10 @@
 const express = require('express');
 
-const userData = require('./signIn').users;
-
 const router = express.Router();
 
-router.get('/api/admin', (req, res, next) => {
-    res.render('admin', {
-        pageTitle: 'admin',
-        pagePath: '/api/admin',
-        users: userData
-    });
-});
+const adminController = require('../controllers/admin');
+
+
+router.get('/admin', adminController.getAdmin);
 
 module.exports = router;

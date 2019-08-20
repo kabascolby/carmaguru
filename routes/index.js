@@ -1,14 +1,8 @@
 const express = require('express');
-
-// const mainPath = require('../utility/path');
+const imagesController = require('../controllers/images');
 
 const router = express.Router();
 
-router.get('/', (req, res, next) => {
-    res.render('index', {
-        pageTitle: 'Welcome To Tof-Tof',
-        pagePath: '/'
-    });
-});
+router.get('/', imagesController.displayImages);
 
 module.exports = router;

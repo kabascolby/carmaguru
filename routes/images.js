@@ -1,12 +1,8 @@
-const path = require('path');
 const express = require('express');
-
-const mainPath = require('../utility/path');
+const imagesController = require('../controllers/images');
 
 const router = express.Router();
 
-router.get('/images', (req, res, next) => {
-    res.sendFile(path.join(mainPath, 'views', 'images.html'))
-});
+router.get('/images', imagesController.getImages);
 
 module.exports = router;

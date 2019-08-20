@@ -2,12 +2,21 @@
     </head>
     <%-include('includes/navigation')%>
 <body>
-	<ul> 
-	<% for (let user in users) { %>
-		<li><p>Name:<%=users[user].first%> - <%=users[user].last%></p>
-			<p><%=users[user].username%></p>
-			<p><%=users[user].username%></p>
-		</li>
-	<% } %>
-	</ul>
+	<div class="content">
+		<main>
+			<ul>  
+				<% if(Object.keys(users).length === 0){%>
+					<h1>No User in the Database...</h1>
+				<%}%>
+				<% for (let user in users) { %>
+					<hr>
+					<li><p>Name: <%=users[user].first%> - <%=users[user].last%></p>
+						<p>Username: <%=users[user].username%></p>
+						<p>email: <%=users[user].email%></p>
+					</li>
+					<br>
+				<% } %>
+			</ul>
+		</main>
+	</div> 
 	<%-include('includes/end')%>

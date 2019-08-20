@@ -1,9 +1,30 @@
 <%- include('includes/start') %>
+<link rel="stylesheet" type="text/css" href="/css/gallery.css">
     </head>
-
     <body>
-        <%-include('includes/navigation') %>
+    <%-include('includes/navigation') %>
+		<div class="content">
             <main>
-                <p>Something to work on Later</p>
+				<section class="main-grid">
+					<div class="capture">
+						<canvas id="canvas" width=1080 height=720></canvas>
+						<img src="" alt="Image preview...">
+						<video id="player" controls autoplay></video>
+					</div>
+					<div>
+						<p>filters</p>
+					</div>
+						<div class="nested">
+							<button id="capture">Capture</button>
+							<input type="file" id="file-input" accept="image/*;capture=user">
+							<button id="capture">Save</button>
+						</div>
+				</section>
+						<script src="/js/capture.js" ></script>
+				<aside class="thumbnail-grid">
+					<div>previous images thumbnails</div>
+					<div>previous images thumbnails</div>
+				</aside>
             </main>
-            <%-include('includes/end')%>
+		</div>
+<%-include('includes/end')%>

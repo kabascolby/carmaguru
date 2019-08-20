@@ -14,10 +14,9 @@ h1,
 div,
 p,
 header {
-    position: fixed;
     padding: 0;
     margin: 0;
-    /* display: block; */
+    display: block;
     font-family: sans-serif;
 }
 
@@ -28,12 +27,16 @@ body {
 }
 
 .content {
+    padding: 16px;
+    position: relative;
     display: grid;
     align-items: center;
     width: 96vw;
+    margin: 0 auto;
 }
 
-.content form {
+.content form,
+.content main {
     margin-top: 10%;
 }
 
@@ -115,12 +118,12 @@ nav a {
 .nav-toggle-label span,
 .nav-toggle-label span::before,
 .nav-toggle-label span::after {
+    position: relative;
     display: block;
     background: white;
     height: 2px;
     width: 2em;
     border-radius: 2px;
-    position: relative;
 }
 
 .nav-toggle-label span::before,
