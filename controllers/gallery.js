@@ -4,3 +4,7 @@ exports.getGallery = (req, res, next) => {
         pagePath: '/gallery'
     });
 };
+
+exports.postImages = (req, res, next) => {
+    console.log(req.body);
+}

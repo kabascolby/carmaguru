@@ -24,34 +24,32 @@ exports.getUserLoginPage = (req, res, next) => {
 };
 
 exports.postUserLoginPage = (req, res, next) => {
-    const userDb = UserDb.fetchAll(data => {
-        return data;
+    const userDb = UserDb.fetchAll(userInfos => {
+        let user = req.body;
+
+        //TODO security and cookies checking has to be applicate here before redirection
+        console.log(userInfos)
+        if (Object.keys(user).length &&
+            Object.keys(userInfos).length &&
+            (userInfos.hasOwnProperty(user.username)) &&
+            (user.psw === userInfos[user.username].psw)) {
+            res.redirect('/');
+        } else
+            res.send('Invalide User credential');
     });
-    let user = req.body;
-
-    //TODO security and cookies checking has to be applicate here before redirection
-
-
-    if (Object.keys(user).length &&
-        Object.keys(userDb).length &&
-        (user.username === userDb[user.username].username) &&
-        (user.psw === userDb[user.username].psw)) {
-        res.redirect('/');
-    } else
-        res.send('Invalide User credential');
 };
 
 
 // signin Logic implementation
 
-exports.getUserSigninPage = (req, res, next) => {
+exports.getUserRegistration = (req, res, next) => {
     res.render('signIn', {
         pageTitle: 'SignIn',
         pagePath: '/api/singIn/'
     })
 };
 
-exports.postUserSigninPage = (req, res, next) => {
+exports.postUserRegistration = (req, res, next) => {
     try {
         let form = req.body;
         formValidation(form);

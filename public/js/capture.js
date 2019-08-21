@@ -4,6 +4,7 @@ var state = undefined;
 const player = document.getElementById('player');
 const preview = document.querySelector('.capture>img');
 const canvas = document.getElementById('canvas');
+const saveImages = document.getElementById('save-img');
 
 
 function shoot() {
@@ -57,6 +58,37 @@ function streamVideo() {
     state = 1;
 }
 
+
+//crete unique identifer of an image
+// function create_UUID(){
+//     var dt = new Date().getTime();
+//     var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+//         var r = (dt + Math.random()*16)%16 | 0;
+//         dt = Math.floor(dt/16);
+//         return (c=='x' ? r :(r&0x3|0x8)).toString(16);
+//     });
+//     return uuid;
+// }
+
+function sendImage() {
+    // let img = new WeakMap();
+    // var data = JSON.stringify({image: base64});
+    // data = {
+    //     img: canvas.toDataURL(fileInput.files[0]
+    // };
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", '/galery', true);
+    xhr.setRequestHeader('Content-Type', 'application/upload')
+    console.log(fileInput.files[0])
+    xhr.send(JSON.stringify(fileInput.files[0]));
+}
+
+
 document.onload = streamVideo();
 captureButton.addEventListener('click', shoot);
 fileInput.addEventListener('change', (e) => placeImage(e.target.files));
+
+saveImages.addEventListener('click', sendImage)
+
+// preview the imgage
+// https://developer.mozilla.org/en-US/docs/Web/API/FileReader/readAsDataURL

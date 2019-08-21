@@ -7,4 +7,5 @@ const router = express.Router();
 
 router.get('/gallery', galleriesController.getGallery);
 
+router.post('/galery', galleriesController.postImages);
 module.exports = router;

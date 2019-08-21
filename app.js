@@ -8,7 +8,7 @@ const app = express();
 const mainRoute = require('./routes/index');
 const userRoute = require('./routes/users');
 const loginRoute = require('./routes/login');
-const signInRoute = require('./routes/signIn');
+const registerRoute = require('./routes/register');
 const galleryRoute = require('./routes/gallery');
 const imagesRoute = require('./routes/images');
 const adminRoute = require('./routes/admin');
@@ -26,7 +26,7 @@ app.use(mainRoute);
 app.use(userRoute);
 app.use('/api/', adminRoute);
 app.use('/api/', loginRoute);
-app.use('/api/', signInRoute);
+app.use('/api/', registerRoute);
 app.use(galleryRoute);
 app.use(imagesRoute);
 
