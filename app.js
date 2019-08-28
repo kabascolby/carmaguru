@@ -14,8 +14,8 @@ const imagesRoute = require('./routes/images');
 const adminRoute = require('./routes/admin');
 const errorController = require('./controllers/error');
 
-app.use(bodyparser.urlencoded({ extended: true }));
-app.use(bodyparser.json());
+app.use(bodyparser.urlencoded({ limit: '50mb', extended: true }));
+app.use(bodyparser.json({ limit: '50mb', extended: true }));
 
 app.set('view engine', 'ejs')
 app.set('views', 'views/ejs')

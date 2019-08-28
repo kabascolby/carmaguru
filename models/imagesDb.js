@@ -8,37 +8,116 @@ const p = path.join(
 );
 
 
-function getImages(cb) {
-    fs.readFile(p, (err, images) => {
-        if (err) {
-            console.log('error readding file or empty DB', err);
-            cb({});
-        } else {
-            cb(JSON.parse(images));
-        }
-    })
-
+function getImages() {
+    return new Promise((resolve, reject) => {
+        fs.readFile(p, (err, imgsDB) => {
+            if (err) {
+                console.log('error readding file or empty DB', err);
+                resolve({});
+            } else {
+                try {
+                    resolve(JSON.parse(imgsDB));
+                } catch (e) {
+                    console.error('Error Images.json. File will be recreated', e);
+                    resolve({});
+                }
+            }
+        });
+    });
 }
+
+function converToB64(image) {
+    return new Promise((resolve, reject) => {
+        fs.readFile(image.path, { encoding: 'base64' }, (err, binary) => {
+            if (err)
+                reject(err);
+            image.path = binary;
+            resolve(image);
+        });
+    })
+}
+
+function getConvert64(path) {
+    return converToB64(path);
+}
+
+/*
+	TODO
+	the best way is to write the image to the file and to store that path to the database 
+ */
+
+
 
 module.exports = class Images {
-    constructor(id, image, create, username, id) {
-        this.id = id;
-        this.data = image;
-        this.createDate = create;
+    constructor(username, id, filename, imgPath, createDate) {
         this.username = username;
+        this.id = id;
+        this.fname = filename;
+        this.path = imgPath;
+        this.createDate = createDate;
     }
 
-    save() {
-        getImages(imgsDb) {
-            imgsDb[this.id] = this;
-            console.log(imgsDb);
-            fs.writeFile(p, JSON.stringify(imgsDb), (err) => {
-                if (err) console.log('Error writting file.', err);
+    save(cb) {
+        getImages()
+            .then(imgsDb => {
+                imgsDb[this.username] = imgsDb[this.username] || [];
+                imgsDb[this.username].unshift({
+                    id: this.id,
+                    fname: this.fname,
+                    path: this.path,
+                    createDate: this.createDate
+                });
+
+                fs.writeFile(p, JSON.stringify(imgsDb, null, '\t'), (err) => {
+                    if (err) {
+                        console.log('Error writting file.', err);
+                    }
+                    cb();
+                });
+            })
+            .catch(e => {
+                console.log(e);
             });
-        }
     }
 
-    fetchAll(cb) {
-        getImages(cb);
+    static fetchByUser(username, cb) {
+        getImages()
+            .then(imgsDb => {
+                cb(imgsDb[username]);
+            });
     }
+
+    static fetchBinary(username, cb) {
+        this.fetchByUser(username, imgsDb => {
+            let imgsPromises = (imgsDb || []).map(objImg => getConvert64(objImg));
+            Promise.all(imgsPromises)
+                .then(imgs => cb(imgs))
+                .catch(e => cb([]));
+        });
+    }
+
+    static fetchAll(cb) {
+        getImages()
+            .then(imgsDb => {
+                cb(imgsDb);
+            });
+    };
 }
+
+/*
+	TODO
+	comment table implementation
+	comment id;
+	user id;
+	comment date;
+	comment description;
+ */
+
+/*
+	TODO
+	likes table implementation
+	likes id;
+	user id;
+	likes date;
+	likes description;
+ */

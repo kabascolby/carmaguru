@@ -13,7 +13,7 @@ var getUsersData = cb => {
             console.log('empty database or Error readding file', err);
             cb({});
         } else
-            cb(JSON.parse(data));
+            cb(JSON.parse(data || {}));
     });
 }
 

@@ -17,13 +17,21 @@
 						<div class="nested">
 							<button id="capture">Capture</button>
 							<input type="file" id="file-input" accept="image/*;capture=user">
-							<button id="save-img">Save</button>
+							<button id="save-img" disabled>Save</button>
 						</div>
 				</section>
 						<script src="/js/capture.js" ></script>
 				<aside class="thumbnail-grid">
-					<div>previous images thumbnails</div>
-					<div>previous images thumbnails</div>
+				 <%for(let i in imgs){%>
+				 	<div>
+					 <svg class="close">
+						<circle cx="12" cy="12" r="11" stroke="black" stroke-width="2" fill="white" />
+						<path stroke="black" stroke-width="2" fill="none" d="M6.25,6.25,17.75,17.75" />
+						<path stroke="black" stroke-width="2" fill="none" d="M6.25,17.75,17.75,6.25" />
+					</svg>
+					<img src=<%= `data:image/png;base64,${imgs[i].path} `%> alt="">
+					</div>
+				<%}%>			
 				</aside>
             </main>
 		</div>

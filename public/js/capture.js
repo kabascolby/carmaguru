@@ -4,53 +4,86 @@ var state = undefined;
 const player = document.getElementById('player');
 const preview = document.querySelector('.capture>img');
 const canvas = document.getElementById('canvas');
-const saveImages = document.getElementById('save-img');
+const saveImg = document.getElementById('save-img');
+var currentImg;
 
+class ImgToSend {
+    constructor(name, data, status) {
+        this.name = name;
+        this.data = data;
+        this.status = status;
+    }
+}
 
 function shoot() {
     if (state == 1) {
-        preview.style.display = 'none';
-        player.style.display = "none";
-        canvas.style.display = 'inline';
+        resetElement('none', 'none', 'inline', false);
         const context = canvas.getContext('2d');
         context.drawImage(player, 0, 0, canvas.width, canvas.height);
         player.srcObject.getVideoTracks().forEach(track => track.stop());
+
+
+        // Saving the current image info
+        currentImg = new ImgToSend(
+            '',
+            canvas.toDataURL(),
+            1
+        );
         state = 0;
     } else {
         streamVideo();
     }
-
 }
 
-function placeImage(file) {
-    canvas.style.display = 'none';
-    player.style.display = 'none';
-    preview.style.display = 'inline';
-    var reader = new FileReader();
-    player.srcObject.getVideoTracks().forEach(track => track.stop());
-    reader.addEventListener("load", () => {
-        preview.src = reader.result;
-    }, false);
+function resetElement(prev, play, canv, sav) {
+    preview.style.display = prev;
+    player.style.display = play;
+    canvas.style.display = canv;
+    saveImg.disabled = sav;
+}
 
+function placeImage(e) {
+    resetElement('inline', 'none', 'none', false);
+    player.srcObject.getVideoTracks().forEach(track => track.stop());
     if (fileInput.files[0] && (/\.(jpe?g|png|gif)$/i.test(fileInput.files[0].name))) {
-        reader.readAsDataURL(fileInput.files[0]);
+        // Saving the current image info
+        converTobinary(fileInput.files[0], reader => {
+            preview.src = reader.result;
+
+            // saving the current image 
+            if (reader.result.length) {
+                currentImg = new ImgToSend(
+                    fileInput.files[0].name,
+                    reader.result,
+                    2
+                );
+            }
+        })
+        state = 0;
     } else {
-        alert('invalide file')
+        saveImg.disabled = true;
+        alert('invalide file');
+        // return;
     }
 }
 
+function converTobinary(img, cb) {
+    var reader = new FileReader();
+    reader.readAsDataURL(img);
+    reader.onloadend = function() {
+        cb(reader);
+    }
+}
 
 function streamVideo() {
     preview.style.display = 'none';
     player.style.display = "inline";
     canvas.style.display = 'none';
     const constraints = {
-        video: {
-            video: true,
-            width: { max: 1280 },
-            height: { max: 720 }
-        }
+        video: true,
     };
+
+
     navigator.mediaDevices.getUserMedia(constraints)
         .then((stream) => {
             player.srcObject = stream;
@@ -58,37 +91,44 @@ function streamVideo() {
     state = 1;
 }
 
-
-//crete unique identifer of an image
-// function create_UUID(){
-//     var dt = new Date().getTime();
-//     var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-//         var r = (dt + Math.random()*16)%16 | 0;
-//         dt = Math.floor(dt/16);
-//         return (c=='x' ? r :(r&0x3|0x8)).toString(16);
-//     });
-//     return uuid;
-// }
-
 function sendImage() {
-    // let img = new WeakMap();
-    // var data = JSON.stringify({image: base64});
-    // data = {
-    //     img: canvas.toDataURL(fileInput.files[0]
-    // };
-    var xhr = new XMLHttpRequest();
-    xhr.open("POST", '/galery', true);
-    xhr.setRequestHeader('Content-Type', 'application/upload')
-    console.log(fileInput.files[0])
-    xhr.send(JSON.stringify(fileInput.files[0]));
-}
+    var response;
+    // saveImg.disabled = true; //uncomment later
 
+    if (Object.keys(currentImg).length) {
+        response = JSON.stringify(currentImg);
+    } else {
+        response = '';
+    }
+
+    fetch('/gallery', {
+            method: 'POST',
+            body: response,
+            header: new Headers({
+                'Content-Type': 'application/json'
+            })
+        })
+        .then(res => res.json())
+        .then(userImgs => placeThumbmail(userImgs))
+        .catch(err => console.log(err))
+}
+// 
+
+function placeThumbmail(imgTab) {
+    let thumb = document.querySelector('.thumbnail-grid');
+    thumb.innerHTML = "";
+    thumb.insertAdjacentHTML('beforeend', imgTab.map(img => `<div><svg class="close">
+	<circle cx="12" cy="12" r="11" stroke="black" stroke-width="2" fill="white" />
+	<path stroke="black" stroke-width="2" fill="none" d="M6.25,6.25,17.75,17.75" />
+	<path stroke="black" stroke-width="2" fill="none" d="M6.25,17.75,17.75,6.25" />
+</svg><img src=data:image/png;base64,${img.path}></div>`).join(''));
+}
 
 document.onload = streamVideo();
 captureButton.addEventListener('click', shoot);
-fileInput.addEventListener('change', (e) => placeImage(e.target.files));
+fileInput.addEventListener('change', (e) => placeImage(e));
 
-saveImages.addEventListener('click', sendImage)
+saveImg.addEventListener('click', sendImage)
 
-// preview the imgage
+
 // https://developer.mozilla.org/en-US/docs/Web/API/FileReader/readAsDataURL

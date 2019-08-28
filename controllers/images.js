@@ -13,3 +13,6 @@ exports.displayImages = (req, res, next) => {
         pagePath: '/'
     });
 };
+
+// exports.commentImages = (req, res, next) => {
+// }
