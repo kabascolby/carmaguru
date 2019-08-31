@@ -20,19 +20,16 @@
 							<button id="save-img" disabled>Save</button>
 						</div>
 				</section>
-						<script src="/js/capture.js" ></script>
-				<aside class="thumbnail-grid">
-				 <%for(let i in imgs){%>
+				<aside class="thumbnail-grid" id="img-grid">
+				 <%for(let i of imgs){%>
 				 	<div>
-					 <svg class="close">
-						<circle cx="12" cy="12" r="11" stroke="black" stroke-width="2" fill="white" />
-						<path stroke="black" stroke-width="2" fill="none" d="M6.25,6.25,17.75,17.75" />
-						<path stroke="black" stroke-width="2" fill="none" d="M6.25,17.75,17.75,6.25" />
-					</svg>
-					<img src=<%= `data:image/png;base64,${imgs[i].path} `%> alt="">
+						<img src="https://image.flaticon.com/icons/svg/149/149147.svg" title="delete" class="del_img">
+						<img src=<%= `data:image/png;base64,${i.path} `%> id=<%=i.id%> alt=<%=i.fname%>>
 					</div>
 				<%}%>			
 				</aside>
             </main>
 		</div>
+		<script src="/js/editing.js" type="module"></script>
+		<script src="/js/capture.js" type="module" ></script>
 <%-include('includes/end')%>

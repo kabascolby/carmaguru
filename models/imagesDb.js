@@ -41,13 +41,6 @@ function getConvert64(path) {
     return converToB64(path);
 }
 
-/*
-	TODO
-	the best way is to write the image to the file and to store that path to the database 
- */
-
-
-
 module.exports = class Images {
     constructor(username, id, filename, imgPath, createDate) {
         this.username = username;
@@ -84,7 +77,8 @@ module.exports = class Images {
         getImages()
             .then(imgsDb => {
                 cb(imgsDb[username]);
-            });
+            })
+            .catch(e => console.log(e));
     }
 
     static fetchBinary(username, cb) {
@@ -100,8 +94,35 @@ module.exports = class Images {
         getImages()
             .then(imgsDb => {
                 cb(imgsDb);
-            });
+            })
+            .catch(e => console.log(e));
     };
+
+    // TODO remove duplicate code
+
+    static deleteImg(username, imgId, cb) {
+        this.fetchAll(imgsDb => {
+            imgsDb[username].find(el => {
+                console.log(el.id === imgId);
+            })
+            imgsDb[username].forEach((el, idx, tab) => {
+                if (el.id === imgId) {
+                    fs.unlinkSync(el.path);
+                    tab.splice(idx, 1);
+                    return;
+                }
+
+            });
+            fs.writeFile(p, JSON.stringify(imgsDb, null, '\t'), (err) => {
+                if (err) {
+                    console.log('Error writting file.', err);
+                }
+                this.fetchBinary(username, data => {
+                    cb(data);
+                })
+            });
+        });
+    }
 }
 
 /*

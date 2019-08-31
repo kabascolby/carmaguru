@@ -24,34 +24,46 @@ exports.postImages = (req, res, next) => {
     req.on('end', () => {
 
         buff = Buffer.concat(buff).toString();
-        if (buff.length) {
-            const id = create_UUID();
-            const username = 'brianbixby0@gmail.com';
-            const creation = Date.now();
-            const p = path.join(
-                path.dirname(process.mainModule.filename),
-                'data',
-                'img',
-                `img${Math.random(4).toString()}.png`
-            );
 
-            createImg(buff, p)
-                .then(response => {
-                    const fname = response.status === 1 ? //save the filename later
-                        username + Math.random(4).toString() :
-                        response.name;
-                    // username, id, imgPath, createDate
-                    const imagesDb = new ImageClass(username, id, fname, p, creation);
-                    imagesDb.save(() => {
-                        ImageClass.fetchBinary(username, data => {
-                            res.send(data);
-                        })
+        const id = create_UUID();
+        const username = 'brianbixby0@gmail.com';
+        const creation = Date.now();
+        const p = path.join(
+            path.dirname(process.mainModule.filename),
+            'data',
+            'img',
+            `img${Math.random(4).toString()}.png`
+        );
+
+        createImg(buff, p)
+            .then(response => {
+                const fname = response.status === 1 ? //save the filename later
+                    username + Math.random(4).toString() :
+                    response.name;
+                // username, id, imgPath, createDate
+                const imagesDb = new ImageClass(username, id, fname, p, creation);
+                imagesDb.save(() => {
+                    ImageClass.fetchBinary(username, data => {
+                        res.send(data);
                     })
                 })
-                .catch(err => res.send(Error(err)))
-        } else {
-            res.send('Invalide Image');
-        }
+            })
+            .catch(err => res.send(Error(err)))
+    });
+}
+
+exports.deleteImages = (req, res, next) => {
+    var buff = [];
+    req.on('data', (chunk) => {
+        buff.push(chunk);
+    })
+
+    req.on('end', () => {
+        buff = Buffer.concat(buff).toString();
+        buff = JSON.parse(buff);
+        ImageClass.deleteImg(buff.username, buff.id, dataImg => {
+            res.send(dataImg);
+        })
     });
 }
 

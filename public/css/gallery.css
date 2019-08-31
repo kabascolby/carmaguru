@@ -93,28 +93,18 @@ video {
     opacity: 1;
 } */
 
-svg {
+.del_img {
     position: absolute;
     cursor: pointer;
-    height: 24px;
-    width: 24px;
-    top: 2px;
-    right: 2px;
+    height: 15px !important;
+    width: 15px !important;
+    top: 4px;
+    right: 4px;
+    border-radius: 9px;
+    background-color: #ffffffba;
+    transition: background-color .6s
 }
 
-svg>circle {
-    stroke: black;
-    fill: #ffffff85;
-}
-
-svg>path {
-    stroke: black;
-}
-
-svg:hover>circle {
-    fill: red;
-}
-
-svg:hover>path {
-    stroke: white;
+.del_img:hover {
+    background-color: red;
 }

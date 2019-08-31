@@ -1,3 +1,4 @@
+import { api } from './fetch.js';
 const captureButton = document.getElementById('capture');
 const fileInput = document.getElementById('file-input');
 var state = undefined;
@@ -63,7 +64,6 @@ function placeImage(e) {
     } else {
         saveImg.disabled = true;
         alert('invalide file');
-        // return;
     }
 }
 
@@ -92,43 +92,58 @@ function streamVideo() {
 }
 
 function sendImage() {
-    var response;
-    // saveImg.disabled = true; //uncomment later
-
-    if (Object.keys(currentImg).length) {
-        response = JSON.stringify(currentImg);
-    } else {
-        response = '';
+    let options = {
+        method: 'POST',
+        body: JSON.stringify(currentImg),
+        header: new Headers({
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+        })
     }
 
-    fetch('/gallery', {
-            method: 'POST',
-            body: response,
-            header: new Headers({
-                'Content-Type': 'application/json'
-            })
-        })
-        .then(res => res.json())
-        .then(userImgs => placeThumbmail(userImgs))
-        .catch(err => console.log(err))
+    api('/gallery', options, (err, userImgs) => {
+        if (err) {
+            console.log(err);
+        } else {
+            placeThumbmail(userImgs);
+        }
+    });
 }
-// 
 
 function placeThumbmail(imgTab) {
     let thumb = document.querySelector('.thumbnail-grid');
     thumb.innerHTML = "";
-    thumb.insertAdjacentHTML('beforeend', imgTab.map(img => `<div><svg class="close">
-	<circle cx="12" cy="12" r="11" stroke="black" stroke-width="2" fill="white" />
-	<path stroke="black" stroke-width="2" fill="none" d="M6.25,6.25,17.75,17.75" />
-	<path stroke="black" stroke-width="2" fill="none" d="M6.25,17.75,17.75,6.25" />
-</svg><img src=data:image/png;base64,${img.path}></div>`).join(''));
+    thumb.insertAdjacentHTML('beforeend', imgTab.map(img => `
+		<div>
+			<img src="https://image.flaticon.com/icons/svg/149/149147.svg" title="delete" class="del_img">
+			<img src=data:image/png;base64,${img.path} id=${img.id} alt={img.fname}>
+		</div>`).join(''));
+}
+
+function editImg(e) {
+    const img = e || '';
+    const options = {
+        // const img = e.nextElementSibling || '';
+        method: 'DELETE',
+        body: JSON.stringify({ id: img.id }),
+        header: new Headers({
+            'Content-Type': 'application/json'
+        })
+    }
+    console.log('hello');
+
+    // api('/gallery', options, (err, result) => {
+    //     if (err) {
+    //         alert(err);
+    //     } else {
+    //         //manipulation the result
+    //     }
+    // })
 }
 
 document.onload = streamVideo();
 captureButton.addEventListener('click', shoot);
 fileInput.addEventListener('change', (e) => placeImage(e));
-
 saveImg.addEventListener('click', sendImage)
-
 
 // https://developer.mozilla.org/en-US/docs/Web/API/FileReader/readAsDataURL
