@@ -7,9 +7,9 @@ A_init0/readcom
 .vscode
 ._.DS_Store
 ._*
-.png
-.jpeg
-.jpg
+*.png
+*.jpeg
+*.jpg
 # dependencies
 node_modules/
 
