@@ -6,17 +6,19 @@
     <body>
         <%-include('includes/navigation') %>
             <div class="content">
-                <form action="/api/login" method="POST">
-                    <label for="username"><b>Username</b></label>
-                    <input type="text" placeholder="Enter your username" name="username"><br>
-                    <label for="psw"><b>Password</b></label>
-                    <input type="password" placeholder="Enter Password" name="psw" required>
-                    <hr>
-                    <input type="submit" name="submit" class="registerbtn" value="LOGIN">
-					<div class="content login-box">
-                        <a href="/api/signIn" class="login-box_link">I forgot my password</a>
-                        <a href="/api/signIn" class="login-box_link">Don't have an account</a>
-					</div>
-                </form>
+				<main>
+					<form action="/api/login" method="POST">
+						<label for="username"><b>Username</b></label>
+						<input type="text" placeholder="Enter your username" name="username"><br>
+						<label for="psw"><b>Password</b></label>
+						<input type="password" placeholder="Enter Password" name="psw" required>
+						<hr>
+						<input type="submit" name="submit" class="registerbtn" value="LOGIN">
+						<div class="content login-box">
+							<a href="/api/signIn" class="login-box_link">I forgot my password</a>
+							<a href="/api/signIn" class="login-box_link">Don't have an account</a>
+						</div>
+					</form>	
+				</main>
             </div>
             <%-include('includes/end')%>

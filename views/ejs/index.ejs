@@ -1,13 +1,30 @@
 <%- include('includes/start') %>
+ <link rel="stylesheet" href="/css/index.css">
     </head>
-
     <body>
         <%-include('includes/navigation') %>
-	<div class="content">
-            <main>
-                <div class="content">
-                    <h1>Something awesome will happen soon...</h1>
-                </div>
-            </main>
-            <%-include('includes/end')%>
-	</div>
+			<div class="content">
+				<main> 
+					<div class="grid">
+						<%for(let i of imgs){%>
+							<article class="box image-item">
+								<div class="box__image">
+									<img src=<%= `data:image/png;base64,${i.path} `%> class="thumbnail" id=<%=i.id%> alt=<%=i.fname%>>
+								</div>
+								<div class="box__content">
+									<h2 class="image_infos">10l</h2>
+									<h2 class="image_infos">09c</h2>
+								</div>
+								<div class="box__actions">
+									<form action='/gallery/edit' method='POST'> 
+										<input type="hidden" name="imgId" value="<%= i.id %>"> 
+										<button type="submit" class="btn">Edit</button> 
+									</form>
+									<a href="/images/<%= i.id %>" class="btn">Details</a>
+								</div>
+							</article>
+						<%}%>
+					</div>
+				</main>
+			</div>
+    <%-include('includes/end')%>

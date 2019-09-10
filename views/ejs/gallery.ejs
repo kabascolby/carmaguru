@@ -8,23 +8,31 @@
 				<section class="main-grid">
 					<div class="capture">
 						<canvas id="canvas" width=1080 height=720></canvas>
-						<img src="" alt="Image preview...">
+						<%if (edit){%>
+							<img src=<%=`data:image/png;base64,${edit.path} id=${edit.id} class="thumbnail" alt={edit.fname}`%>>
+						<%} else {%>
+							<img src="" alt="Image preview...">
+						<%}%>
 						<video id="player" controls autoplay></video>
 					</div>
 					<div>
 						<p>filters</p>
 					</div>
-						<div class="nested">
-							<button id="capture">Capture</button>
-							<input type="file" id="file-input" accept="image/*;capture=user">
-							<button id="save-img" disabled>Save</button>
+						<div  class="box__actions">
+							<button  class="btn" id="capture">Capture</button>
+							<input class="btn" type="file" id="file-input" accept="image/*;capture=user">
+							<%if (edit){%>
+								<button  class="btn" id="update-img">Update</button>
+							<%} else {%>
+								<button  class="btn" id="save-img" disabled>Save</button>
+							<%}%>
 						</div>
 				</section>
 				<aside class="thumbnail-grid" id="img-grid">
 				 <%for(let i of imgs){%>
 				 	<div>
 						<img src="https://image.flaticon.com/icons/svg/149/149147.svg" title="delete" class="del_img">
-						<img src=<%= `data:image/png;base64,${i.path} `%> id=<%=i.id%> alt=<%=i.fname%>>
+						<img src=<%= `data:image/png;base64,${i.path} `%> class="thumbnail" id=<%=i.id%> alt=<%=i.fname%>>
 					</div>
 				<%}%>			
 				</aside>

@@ -10,19 +10,20 @@ const p = path.join(
 
 function getImages() {
     return new Promise((resolve, reject) => {
-        fs.readFile(p, (err, imgsDB) => {
-            if (err) {
-                console.log('error readding file or empty DB', err);
-                resolve({});
-            } else {
-                try {
-                    resolve(JSON.parse(imgsDB));
-                } catch (e) {
-                    console.error('Error Images.json. File will be recreated', e);
-                    resolve({});
-                }
-            }
-        });
+        var stream = fs.createReadStream(p);
+        var imgsDb = [];
+
+        stream.on('error', function() {
+            resolve({});
+        })
+
+        stream.on('data', function(chunk) {
+            imgsDb.push(chunk)
+        })
+
+        stream.on('end', () => {
+            resolve(JSON.parse(Buffer.concat(imgsDb)));
+        })
     });
 }
 
@@ -102,9 +103,6 @@ module.exports = class Images {
 
     static deleteImg(username, imgId, cb) {
         this.fetchAll(imgsDb => {
-            imgsDb[username].find(el => {
-                console.log(el.id === imgId);
-            })
             imgsDb[username].forEach((el, idx, tab) => {
                 if (el.id === imgId) {
                     fs.unlinkSync(el.path);
@@ -117,9 +115,10 @@ module.exports = class Images {
                 if (err) {
                     console.log('Error writting file.', err);
                 }
-                this.fetchBinary(username, data => {
-                    cb(data);
-                })
+                cb('sucess')
+                    // this.fetchBinary(username, data => {
+                    //     cb(data);
+                    // })
             });
         });
     }

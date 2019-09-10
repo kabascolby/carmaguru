@@ -7,7 +7,10 @@ const router = express.Router();
 
 router.get('/gallery', galleriesController.getGallery);
 
-router.post('/gallery', galleriesController.postImages);
+router.post('/gallery/meta-data', galleriesController.postImages);
+router.post('/gallery/edit', galleriesController.postImageEdit);
 
-router.delete('/gallery', galleriesController.deleteImages);
+router.put('/gallery/update', galleriesController.putImageUpdate);
+
+router.delete('/gallery', galleriesController.deleteImage);
 module.exports = router;

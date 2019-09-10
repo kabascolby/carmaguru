@@ -1,12 +1,27 @@
 const ImageClass = require('../models/imagesDb');
 const fs = require('fs');
 const path = require('path');
+
+
+// create unique identifer of an image
+function create_UUID() {
+    var dt = new Date().getTime();
+    var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        var r = (dt + Math.random() * 16) % 16 | 0;
+        dt = Math.floor(dt / 16);
+        return (c == 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+    });
+    return uuid;
+}
+
+
 exports.getGallery = (req, res, next) => {
     ImageClass.fetchBinary('brianbixby0@gmail.com', userImgs => {
         res.render('gallery', {
             pageTitle: 'Gallery Studio',
             pagePath: '/gallery',
-            imgs: userImgs
+            imgs: userImgs,
+            edit: undefined,
         });
     })
 };
@@ -40,19 +55,57 @@ exports.postImages = (req, res, next) => {
                 const fname = response.status === 1 ? //save the filename later
                     username + Math.random(4).toString() :
                     response.name;
-                // username, id, imgPath, createDate
+
                 const imagesDb = new ImageClass(username, id, fname, p, creation);
                 imagesDb.save(() => {
-                    ImageClass.fetchBinary(username, data => {
-                        res.send(data);
-                    })
+                    /*
+						I'm deleting the image file here
+						cause I dont need it when I'll we use DB  it's will be
+						not included in the querry
+					*/
+
+                    res.send({
+                        username,
+                        id,
+                        fname,
+                        creation
+                    });
                 })
             })
             .catch(err => res.send(Error(err)))
     });
 }
 
-exports.deleteImages = (req, res, next) => {
+exports.putImageUpdate = (req, res, next) => {
+    /*
+    	Here the logic is to update the images metadata and the filter 
+    	*/
+    var buff = [];
+    req.on('data', (chunk) => {
+        buff.push(chunk);
+    })
+
+    req.on('end', () => {
+        buff = Buffer.concat(buff).toString();
+        buff = JSON.parse(buff);
+        ImageClass.fetchBinary('brianbixby0@gmail.com', userImgs => {
+            let imgIdx = userImgs.findIndex(img => img.id === buff.id);
+            /*
+            	TODO: We have to update the file to the database after write to the file
+            */
+            if (imgIdx) {
+                let imgInfo = {...userImgs[imgIdx] }
+                res.send(imgInfo);
+            } else {
+                res.redirect('/404');
+            }
+        });
+
+    });
+}
+
+exports.deleteImage = (req, res, next) => {
+
     var buff = [];
     req.on('data', (chunk) => {
         buff.push(chunk);
@@ -62,10 +115,12 @@ exports.deleteImages = (req, res, next) => {
         buff = Buffer.concat(buff).toString();
         buff = JSON.parse(buff);
         ImageClass.deleteImg(buff.username, buff.id, dataImg => {
-            res.send(dataImg);
+            res.send({});
         })
     });
 }
+
+
 
 function createImg(imgObj, path) {
     let buff = JSON.parse(imgObj);
@@ -82,13 +137,21 @@ function createImg(imgObj, path) {
     });
 }
 
-// create unique identifer of an image
-function create_UUID() {
-    var dt = new Date().getTime();
-    var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-        var r = (dt + Math.random() * 16) % 16 | 0;
-        dt = Math.floor(dt / 16);
-        return (c == 'x' ? r : (r & 0x3 | 0x8)).toString(16);
-    });
-    return uuid;
+
+exports.postImageEdit = (req, res, next) => {
+    const imgId = req.body.imgId;
+    ImageClass.fetchBinary('brianbixby0@gmail.com', userImgs => {
+        let img = userImgs.find(img => img.id === imgId);
+        // let toEdit = `<img src=data:image/png;base64,${img.path} id=${img.id} class="thumbnail" alt={img.fname}>`;
+        if (img) {
+            res.render('gallery', {
+                pageTitle: 'Gallery Edit',
+                pagePath: '/gallery',
+                imgs: userImgs,
+                edit: img
+            });
+        } else {
+            res.redirect('/404');
+        }
+    })
 }

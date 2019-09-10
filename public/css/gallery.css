@@ -43,16 +43,41 @@ body {
     height: 100%;
 }
 
-.nested {
+
+/* .nested {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     grid-gap: 0.5rem;
+} */
+
+.box__actions {
+    display: grid;
+    grid-template-columns: 1fr 1.7fr 1fr;
+    padding: .7rem;
+    text-align: center;
+    grid-gap: 1rem;
+}
+
+.btn {
+    background-color: #4CAF50;
+    color: white;
+    padding: .3rem;
+    border: none;
+    cursor: pointer;
+    opacity: 0.9;
+    text-decoration: none;
+    font-size: .8rem;
+}
+
+.btn:hover {
+    opacity: 1;
 }
 
 .capture>img {
     display: none;
     height: 100%;
-    width: 100%;
+    width: auto;
+    max-width: 100%;
     margin: 0 auto;
     grid-auto-columns: 1fr;
 }
@@ -71,28 +96,6 @@ video {
     margin: 0 auto !important;
 }
 
-
-/* .close {
-    position: absolute;
-    top: 2px;
-    right: 2px;
-    z-index: 100;
-    background-color: #FFF;
-    padding: 5px 2px 2px;
-    color: #000;
-    font-weight: bold;
-    cursor: pointer;
-    opacity: .2;
-    text-align: center;
-    font-size: 22px;
-    line-height: 10px;
-    border-radius: 50%;
-}
-
-.close:hover {
-    opacity: 1;
-} */
-
 .del_img {
     position: absolute;
     cursor: pointer;
@@ -107,4 +110,8 @@ video {
 
 .del_img:hover {
     background-color: red;
+}
+
+.highlight {
+    background-color: #00695dab !important;
 }
