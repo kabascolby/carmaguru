@@ -20,7 +20,7 @@
 							<input type="text" placeholder="Enter Last Name" name="last" required>
 
 							<label for="username"><b>Username</b></label>
-							<input type="text" placeholder="Enter your username" name="username" required>
+							<input type="text" placeholder="Enter your username" name="username" required pattern="\S+" title="No Whitespace" required>
 
 							<label for="email"><b>Email</b></label>
 							<input type="text" placeholder="Enter Email" name="email" required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$">
@@ -30,7 +30,7 @@
 							<hr>
 							<p>By creating an account you agree to our <a href="#">Terms & Privacy</a>.</p>
 							<!-- <input type="submit" class="registerbtn" name="submit" value="OK">Register> -->
-							<input type="submit" class="registerbtn" name="submit" value="REGISTER">
+							<input type="submit" class="registerbtn" name="submit">
 						</div>
 						<div class="container signin">
 							<p>Already have an account? <a href="/api/login">Login</a>.</p>

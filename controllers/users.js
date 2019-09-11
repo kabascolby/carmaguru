@@ -23,20 +23,24 @@ exports.getUserLoginPage = (req, res, next) => {
     });
 };
 
-exports.postUserLoginPage = (req, res, next) => {
-    const userDb = UserDb.fetchAll(userInfos => {
-        let user = req.body;
+exports.postUserLoginPage = (req, res, next) => { //working here
+    let user = req.body;
+    UserDb.fetchAll()
+        .then(data => {
 
-        //TODO security and cookies checking has to be applicate here before redirection
-        console.log(userInfos)
-        if (Object.keys(user).length &&
-            Object.keys(userInfos).length &&
-            (userInfos.hasOwnProperty(user.username)) &&
-            (user.psw === userInfos[user.username].psw)) {
-            res.redirect('/');
-        } else
-            res.send('Invalide User credential');
-    });
+        })
+
+
+    //TODO security and cookies checking has to be applicate here before redirection
+    console.log(userInfos)
+    if (Object.keys(user).length &&
+        Object.keys(userInfos).length &&
+        (userInfos.hasOwnProperty(user.username)) &&
+        (user.psw === userInfos[user.username].psw)) {
+        res.redirect('/');
+    } else
+        res.send('Invalide User credential');
+
 };
 
 
@@ -50,15 +54,12 @@ exports.getUserRegistration = (req, res, next) => {
 };
 
 exports.postUserRegistration = (req, res, next) => {
-    try {
-        let form = req.body;
-        formValidation(form);
-        const userDb = new UserDb(form);
-        userDb.save();
-        res.redirect('/api/login');
-    } catch {
-        throw new Error('Error on Post user form');
-    }
+    let form = req.body;
+    formValidation(form);
+    const userDb = new UserDb(form);
+    //TODO CHECK IF USERNAME ALREADY EXIST
+    userDb.save().catch(e => console.error(e, 'Error on Post user form'));
+    res.redirect('/api/login');
 };
 
 //TODO FIX THIS DOESN NEED THIS PART

@@ -13,4 +13,5 @@ router.post('/gallery/edit', galleriesController.postImageEdit);
 router.put('/gallery/update', galleriesController.putImageUpdate);
 
 router.delete('/gallery', galleriesController.deleteImage);
+
 module.exports = router;
