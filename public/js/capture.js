@@ -25,11 +25,8 @@ function shoot() {
         player.srcObject.getVideoTracks().forEach(track => track.stop());
 
         // Saving the current image info
-        currentImg.value = new ImgToSend(
-            '',
-            canvas.toDataURL(),
-            1
-        );
+        new ImgToSend('', canvas.toDataURL(), 1);
+        Object.assign(currentImg, new ImgToSend('', canvas.toDataURL(), 1));
         state.value = 0;
     } else {
         streamVideo();
@@ -46,11 +43,11 @@ function placeImage(e) {
 
             // saving the current image 
             if (reader.result.length) {
-                currentImg.value = new ImgToSend(
+                Object.assign(currentImg, new ImgToSend(
                     fileInput.files[0].name,
                     reader.result,
                     2
-                );
+                ));
             }
         })
         state.value = 0;
@@ -89,7 +86,7 @@ function displayImage() {
 
     let options = {
         method: 'POST',
-        body: JSON.stringify(currentImg.value),
+        body: JSON.stringify(currentImg),
         header: new Headers({
             'Content-Type': 'application/json',
             'Access-Control-Allow-Origin': '*'
@@ -101,7 +98,7 @@ function displayImage() {
             alert('Ooops please retry again')
             console.log(err);
         } else {
-            userImgs.data = currentImg.value.data;
+            userImgs.data = currentImg.data;
             renderThumbmail(userImgs);
         }
     });
@@ -115,6 +112,7 @@ function updateImage() { // here I have to insert the new filter metadata
         method: 'PUT',
         body: JSON.stringify({
             id: preview.id,
+            userId: tempId,
             data: preview.src,
         }),
 
@@ -128,10 +126,6 @@ function updateImage() { // here I have to insert the new filter metadata
         if (err) {
             alert('Ooops please retry again')
             console.log(err);
-        } else {
-            console.log(data);
-            // userImgs.data = currentImg.value.data;
-            // renderThumbmail(userImgs);
         }
     });
 }
@@ -148,3 +142,4 @@ fileInput.addEventListener('change', (e) => placeImage(e));
 saveImg ? saveImg.addEventListener('click', displayImage) : updateImg.addEventListener('click', updateImage)
 
 // https://developer.mozilla.org/en-US/docs/Web/API/FileReader/readAsDataURL
+// "647b1c57-d4af-11e9-853a-0242ac110002"

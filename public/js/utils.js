@@ -7,7 +7,7 @@ let thumb = document.getElementById('img-grid');
 
 export const state = { value: undefined };
 
-export const currentImg = { value: undefined };
+export const currentImg = {};
 
 export function api(route, options, callBack) {
     fetch(route, options)
@@ -48,6 +48,7 @@ export function resetElements(prev, play, canv, status) {
 
 export class ImgToSend {
     constructor(name, data, status) {
+        this.userId = 'd3a9a91e-d4ed-11e9-85d5-0242ac110002';
         this.name = name;
         this.data = data;
         this.status = status;

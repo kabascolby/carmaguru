@@ -1,22 +1,15 @@
-const ImageClass = require('../models/imagesDb');
 const fs = require('fs');
-const path = require('path');
+const Stream = require('stream');
 
+const ImageClass = require('../models/imagesDb');
+const path = require('path');
+const tempId = 'd3a9a91e-d4ed-11e9-85d5-0242ac110002';
 
 // create unique identifer of an image
-function create_UUID() {
-    var dt = new Date().getTime();
-    var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-        var r = (dt + Math.random() * 16) % 16 | 0;
-        dt = Math.floor(dt / 16);
-        return (c == 'x' ? r : (r & 0x3 | 0x8)).toString(16);
-    });
-    return uuid;
-}
 
 
 exports.getGallery = (req, res, next) => {
-    ImageClass.fetchBinary('brianbixby0@gmail.com', userImgs => {
+    ImageClass.fetchBinary(tempId, userImgs => {
         res.render('gallery', {
             pageTitle: 'Gallery Studio',
             pagePath: '/gallery',
@@ -27,52 +20,56 @@ exports.getGallery = (req, res, next) => {
 };
 
 exports.postImages = (req, res, next) => {
-    // req.setTimeout(0);
+
     /*
-    	TODO: return the username form the cookies 
-     */
+	TODO: return the username form the cookies 
+	*/
+
     var buff = [];
+
     req.on('data', (chunk) => {
         buff.push(chunk);
     })
 
     req.on('end', () => {
 
-        buff = Buffer.concat(buff).toString();
-
-        const id = create_UUID();
-        const username = 'brianbixby0@gmail.com';
-        const creation = Date.now();
-        const p = path.join(
+        var imgPath = path.join(
             path.dirname(process.mainModule.filename),
             'data',
             'img',
             `img${Math.random(4).toString()}.png`
         );
 
-        createImg(buff, p)
-            .then(response => {
-                const fname = response.status === 1 ? //save the filename later
-                    username + Math.random(4).toString() :
-                    response.name;
+        buff = Buffer.concat(buff).toString();
+        buff = JSON.parse(buff);
+        buff.data = buff.data.split(';base64,').pop();
 
-                const imagesDb = new ImageClass(username, id, fname, p, creation);
-                imagesDb.save(() => {
-                    /*
-						I'm deleting the image file here
-						cause I dont need it when I'll we use DB  it's will be
-						not included in the querry
-					*/
+        createImg(buff.data, imgPath, (data => {
+            delete buff.data;
+            if (data === null) {
+                console.log('error----------------->')
+                return res.send(null);
+            }
 
-                    res.send({
-                        username,
-                        id,
-                        fname,
-                        creation
-                    });
+            const imgInfos = {
+                userId: buff.userId,
+                modification: Date.now(),
+                path: imgPath,
+                fname: buff.status === 1 ? //save the filename later
+                    'img' + (Math.random().toString()).replace('0.', '') + '.png' : buff.name
+            }
+
+            const imagesDb = new ImageClass(imgInfos);
+            imagesDb.save()
+                .then((data, fieldData) => {
+                    if (!data[0].warningStatus) {
+                        res.send({});
+                    } else {
+                        res.send(null);
+                    }
                 })
-            })
-            .catch(err => res.send(Error(err)))
+                .catch(e => console.log(e));
+        }));
     });
 }
 
@@ -88,7 +85,7 @@ exports.putImageUpdate = (req, res, next) => {
     req.on('end', () => {
         buff = Buffer.concat(buff).toString();
         buff = JSON.parse(buff);
-        ImageClass.fetchBinary('brianbixby0@gmail.com', userImgs => {
+        ImageClass.fetchBinary(tempId, userImgs => {
             let imgIdx = userImgs.findIndex(img => img.id === buff.id);
             /*
             	TODO: We have to update the file to the database after write to the file
@@ -114,33 +111,16 @@ exports.deleteImage = (req, res, next) => {
     req.on('end', () => {
         buff = Buffer.concat(buff).toString();
         buff = JSON.parse(buff);
-        ImageClass.deleteImg(buff.username, buff.id, dataImg => {
+        ImageClass.deleteImg(buff.userId, buff.id, dataImg => {
             res.send({});
         })
     });
 }
 
 
-
-function createImg(imgObj, path) {
-    let buff = JSON.parse(imgObj);
-    return new Promise((resolve, reject) => {
-        buff.data = (buff.data).split(';base64,').pop()
-        fs.writeFile(path, buff.data, { encoding: 'base64' }, (err) => {
-            if (err) {
-                reject(Error(err));
-            }
-            delete buff.data;
-            console.log('image created');
-            resolve(buff)
-        });
-    });
-}
-
-
 exports.postImageEdit = (req, res, next) => {
     const imgId = req.body.imgId;
-    ImageClass.fetchBinary('brianbixby0@gmail.com', userImgs => {
+    ImageClass.fetchBinary(tempId, userImgs => {
         let img = userImgs.find(img => img.id === imgId);
         // let toEdit = `<img src=data:image/png;base64,${img.path} id=${img.id} class="thumbnail" alt={img.fname}>`;
         if (img) {
@@ -154,4 +134,15 @@ exports.postImageEdit = (req, res, next) => {
             res.redirect('/404');
         }
     })
+}
+
+
+function createImg(imgB64, p, cb) {
+    fs.writeFile(p, imgB64, { encoding: 'base64' }, (err) => {
+        if (err) {
+            cb(null);
+        }
+        cb('OK');
+        console.log('image created');
+    });
 }

@@ -23,24 +23,18 @@ exports.getUserLoginPage = (req, res, next) => {
     });
 };
 
-exports.postUserLoginPage = (req, res, next) => { //working here
-    let user = req.body;
-    UserDb.fetchAll()
-        .then(data => {
-
-        })
-
-
-    //TODO security and cookies checking has to be applicate here before redirection
-    console.log(userInfos)
-    if (Object.keys(user).length &&
-        Object.keys(userInfos).length &&
-        (userInfos.hasOwnProperty(user.username)) &&
-        (user.psw === userInfos[user.username].psw)) {
-        res.redirect('/');
-    } else
-        res.send('Invalide User credential');
-
+exports.postUserLoginPage = (req, res, next) => {
+    const user = req.body;
+    console.log(req.body)
+    UserDb.fetchUser(req.body.username)
+        .then(([data, fieldData]) => {
+            console.log(data);
+            if (data[0].password === req.body.psw) {
+                res.redirect('/');
+            } else {
+                res.redirect('/404');
+            }
+        }).catch(e => res.redirect('/404'))
 };
 
 
@@ -58,7 +52,8 @@ exports.postUserRegistration = (req, res, next) => {
     formValidation(form);
     const userDb = new UserDb(form);
     //TODO CHECK IF USERNAME ALREADY EXIST
-    userDb.save().catch(e => console.error(e, 'Error on Post user form'));
+    userDb.save()
+        .catch(e => console.error(e, 'Error on Post user form'));
     res.redirect('/api/login');
 };
 

@@ -7,18 +7,20 @@ import {
     ImgToSend,
     currentImg
 } from './utils.js';
+const uid = 'd3a9a91e-d4ed-11e9-85d5-0242ac110002';
 
 const preview = document.querySelector('.capture>img');
 
 var activeTbn = null; //active thumbnail
 
+// work on here--------------------------------------------
 function deleteImg(e) {
     const img = e.nextElementSibling;
     const options = {
         method: 'DELETE',
 
         body: JSON.stringify({
-            username: 'brianbixby0@gmail.com', //Todo grab username
+            userId: uid, //Todo grab username
             id: img.id
         }),
 
@@ -47,11 +49,7 @@ function editImage(img) {
         player.srcObject.getVideoTracks().forEach(track => track.stop());
     preview.src = img.src;
     if (img.src.length) {
-        currentImg.value = new ImgToSend(
-            img.name,
-            img.src,
-            1
-        );
+        Object.assign(currentImg, new ImgToSend(img.name, img.src, 1));
     }
     state.value = 0;
 }

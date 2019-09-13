@@ -1,11 +1,12 @@
 const path = require('path');
 const mainPath = require('../utility/path');
 const ImageClass = require('../models/imagesDb');
+const uid = 'd3a9a91e-d4ed-11e9-85d5-0242ac110002';
 
 
 
 exports.getImages = (req, res, next) => {
-    ImageClass.fetchBinary('brianbixby0@gmail.com', images => {
+    ImageClass.fetchBinary(uid, images => {
         res.render('images', {
             pageTitle: 'Image Details',
             pagePath: '/images',
@@ -17,7 +18,7 @@ exports.getImages = (req, res, next) => {
 
 
 exports.displayImages = (req, res, next) => {
-    ImageClass.fetchBinary('brianbixby0@gmail.com', images => {
+    ImageClass.fetchBinary(uid, images => {
         res.render('index', {
             pageTitle: 'Welcome To Tof-Tof',
             pagePath: '/',
@@ -33,7 +34,7 @@ exports.displayImages = (req, res, next) => {
 */
 exports.getImageDetails = (req, res, next) => {
     const imgId = req.params.imageId;
-    ImageClass.fetchBinary('brianbixby0@gmail.com', images => {
+    ImageClass.fetchBinary(uid, images => {
         let imgs = images.find(img => img.id === imgId);
         if (imgs) {
             res.render('images', {

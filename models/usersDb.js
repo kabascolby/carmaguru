@@ -38,7 +38,7 @@ module.exports = class User {
 				email,
 				password
 			)VALUES(
-				UUID_TO_BIN(UUID()),
+				UUID(),
 				'2', 
 				'${this.firstName}',
 				'${this.lastName}',
@@ -47,12 +47,18 @@ module.exports = class User {
 				'${this.passWord}'
 			)`
         console.log(this);
-        db.execute(credentials)
-            .catch(e => console.error(e));
+        return db.execute(credentials);
     }
 
     static getUserNames() {
         return db.execute(`SELECT username FROM users`);
+    }
+
+    static fetchUser(userName) {
+        return db.execute(`Select *
+			FROM users
+				WHERE username = '${userName}'
+		`);
     }
 
     static fetchAll() {
