@@ -108,13 +108,11 @@ function displayImage() {
 
 
 function updateImage() { // here I have to insert the new filter metadata
+    const imgToUpdate = new ImgToSend('', preview.src, 1);
+    imgToUpdate.id = preview.id;
     let options = {
         method: 'PUT',
-        body: JSON.stringify({
-            id: preview.id,
-            userId: tempId,
-            data: preview.src,
-        }),
+        body: JSON.stringify(imgToUpdate),
 
         header: new Headers({
             'Content-Type': 'application/json',
@@ -126,6 +124,8 @@ function updateImage() { // here I have to insert the new filter metadata
         if (err) {
             alert('Ooops please retry again')
             console.log(err);
+        } else {
+            console.log(data);
         }
     });
 }
@@ -142,4 +142,3 @@ fileInput.addEventListener('change', (e) => placeImage(e));
 saveImg ? saveImg.addEventListener('click', displayImage) : updateImg.addEventListener('click', updateImage)
 
 // https://developer.mozilla.org/en-US/docs/Web/API/FileReader/readAsDataURL
-// "647b1c57-d4af-11e9-853a-0242ac110002"

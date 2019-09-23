@@ -6,6 +6,9 @@
 			<div class="content">
 				<main> 
 					<div class="grid">
+						<%if(!imgs.length){%>
+							<h1  style="color:#FFF;"> No Images Yet...</h1>
+						<%}%>
 						<%for(let i of imgs){%>
 							<article class="box image-item">
 								<div class="box__image">

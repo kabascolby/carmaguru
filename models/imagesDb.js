@@ -1,15 +1,9 @@
 const fs = require('fs');
 const db = require('../utility/database');
 
-// const p = path.join(
-//     path.dirname(process.mainModule.filename),
-//     'data',
-//     'images.json'
-// );
-
-
 module.exports = class Images {
     constructor(imgInfos) {
+        this.imgId = imgInfos.imgId;
         this.username = imgInfos.username;
         this.uId = imgInfos.userId;
         this.fname = imgInfos.fname;
@@ -20,15 +14,8 @@ module.exports = class Images {
     save() {
         const sql = `INSERT INTO images
 			(id, user_id, fname, path, modif_date)
-			VALUES(
-				UUID(),
-				'${this.uId}',
-				'${this.fname}',
-				'${this.path}',
-				'${this.modification}'
-			)
-		`
-        return db.execute(sql);
+			VALUES(?, ?, ?, ?, NOW())`
+        return db.execute(sql, [this.imgId, this.uId, this.fname, this.path]);
 
     }
 
@@ -36,48 +23,71 @@ module.exports = class Images {
         const sql = `SELECT *
 			FROM images
 			WHERE user_id = '${userId}'
-		`
+			ORDER BY create_date DESC`
         return db.execute(sql);
     }
 
+    static fetchImage(uId, imgId) {
+        var sql = `SELECT path FROM images
+		WHERE user_id = ? AND id = ?`;
+
+        return db.execute(sql, [uId, imgId]);
+    }
+
     static fetchBinary(userId, cb) {
-            this.fetchByUser(userId)
-                .then(([userImgs, fieldData]) => {
-                    let imgsPromises = [];
+        this.fetchByUser(userId)
+            .then(([userImgs, fieldData]) => {
+                let imgsPromises = [];
 
-                    for (var imgProm of userImgs) {
-                        imgsPromises.push(getConvert64(imgProm))
-                    }
+                for (var imgProm of userImgs) {
+                    imgsPromises.push(converToB64(imgProm));
+                }
 
-                    Promise.all(imgsPromises)
-                        .then(imgs => cb(imgs))
-                        .catch(e => cb([]));
-                })
-                .catch(e => console.log(e));
-        }
-        // work on here----------------------------------------------
+                Promise.all(imgsPromises)
+                    .then(imgs => cb(imgs))
+                    .catch(e => cb([]));
+            })
+            .catch(e => console.log(e));
+    }
+
     static deleteImg(uId, imgId, cb) {
-        let sql = `SELECT path FROM images
-			WHERE user_id = '${uId}' AND id = '${imgId}'`
-        db.execute(sql)
+
+
+        var delSql = `DELETE FROM images 
+			WHERE user_id = ? AND id = ?`;
+
+        this.fetchImage(uId, imgId)
             .then(([data, fieldData]) => {
-                fs.unlinkSync(data[0].path);
-                let sql = `DELETE FROM images WHERE user_id = '${uId}' AND id = '${imgId}`
-                db.execute(sql)
-                    .catch(e => console.error(new Error('Failed to delete in the DataBase', e)));
-            }).catch(e => console.log(e));
+                cb([delImgFromDrive(data[0].path), db.execute(delSql, [uId, imgId])]); /* return an array of Promises */
+            })
+            .catch(e => console.error(e));
+    }
+
+    static updateImg(uId, imgId) {
+        var sql = `UPDATE images 
+			SET modif_date=NOW()
+			WHERE user_id = ? AND id = ?`;
+        db.execute(sql, [uId, imgId]);
     }
 }
 
-function getConvert64(img) {
-    return converToB64(img);
+/* Making the file deletion a  promise */
+function delImgFromDrive(path) {
+    return new Promise((resolve, reject) => {
+        fs.unlink(path, err => {
+            if (err) reject(err);
+            resolve('successfully deleted local image');
+        })
+    })
 }
 
 function converToB64(image) {
     return new Promise((resolve, reject) => {
         fs.readFile(image.path, { encoding: 'base64' }, (err, binary) => {
             if (err) {
-                resolve('');
+
+                image.fname = ''
+                resolve(image);
                 console.error(new Error('Invalide Path', err));
             }
             image.path = binary;
@@ -85,27 +95,6 @@ function converToB64(image) {
         });
     })
 }
-
-
-// function getImages(p) {
-//     return new Promise((resolve, reject) => {
-//         var stream = fs.createReadStream(p);
-//         var imgsDb = [];
-
-//         stream.on('error', function() {
-//             resolve({});
-//         })
-
-//         stream.on('data', function(chunk) {
-//             imgsDb.push(chunk)
-//         })
-
-//         stream.on('end', () => {
-//             resolve(JSON.parse(Buffer.concat(imgsDb)));
-//         })
-//     });
-// }
-
 
 /*
 	TODO

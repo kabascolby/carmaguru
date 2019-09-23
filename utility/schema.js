@@ -30,8 +30,8 @@ function createImageTable() {
 		user_id varchar(36) NOT NULL,
 		fname varchar(100) NOT NULL,
 		path varchar(255) NOT NULL,
-		modif_date varchar(15),
-		create_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+		modif_date TIMESTAMP(2) DEFAULT CURRENT_TIMESTAMP(2) ON UPDATE CURRENT_TIMESTAMP(2),
+		create_date TIMESTAMP(2) DEFAULT CURRENT_TIMESTAMP(2)
 	)ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;`
     db.execute(sql).then(data => data[0].warningStatus === 0 ?
         console.log('image table Created', data[0]) : server.imgStatus = 0
@@ -47,3 +47,5 @@ if (server.imgStatus) {
 }
 
 // http://www.mysqltutorial.org/mysql-uuid/
+// https://stackoverflow.com/questions/2187593/can-mysql-convert-a-stored-utc-time-to-local-timezone
+// https://stackoverflow.com/questions/409286/should-i-use-the-datetime-or-timestamp-data-type-in-mysql?rq=1

@@ -8,7 +8,17 @@
 					<div class="main-img">
 						<img src=<%= `data:image/png;base64,${mainImg.path} `%> alt="" id="current" data-id=<%=mainImg.id%>>
 					</div>
-					
+					<div class="comment_block">
+						<div class="create_new_comment">
+							<div class="user_avatar">
+
+							</div>
+							<div class="input_comment">
+								<input type="text"  placeholder="Join the conversation" name="" value="">
+							</div>
+						</div>
+						
+					</div>
 					<div class="imgs">
 					 <%for(let i of imgs){%>
 							<img src=<%= `data:image/png;base64,${i.path} `%> class="thumbnail" id=<%=i.id%> alt=<%=i.fname%>>
