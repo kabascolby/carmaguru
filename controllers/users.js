@@ -17,6 +17,7 @@ function formValidation(form) {
 // loging logic implementation
 
 exports.getUserLoginPage = (req, res, next) => {
+    console.log('cookie---------->', req.get('Cookie'));
     res.render('login', {
         pageTitle: 'Login',
         pagePath: '/api/login'
@@ -30,6 +31,7 @@ exports.postUserLoginPage = (req, res, next) => {
         .then(([data, fieldData]) => {
             console.log(data);
             if (data[0].password === req.body.psw) {
+                res.setHeader('Set-Cookie', 'loggedIn=true');
                 res.redirect('/');
             } else {
                 res.redirect('/404');
