@@ -38,7 +38,9 @@ app.use(imagesRoute);
 
 app.use(errorController.get404);
 
-app.listen(PORT, (err) => {
+const server = app.listen(PORT, (err) => {
     if (err) console.log(err);
     console.log('Server running on http://localhost:' + PORT);
 })
+
+server.keepAliveTimeout = 0;
