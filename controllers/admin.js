@@ -6,7 +6,8 @@ exports.getAdmin = (req, res, next) => {
         res.render('admin', {
             pageTitle: 'admin',
             pagePath: '/api/admin',
-            users: data
+            users: data,
+            isAuth: req.session.isLoggedIn
         });
     })
 }

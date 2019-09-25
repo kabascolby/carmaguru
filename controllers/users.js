@@ -17,10 +17,10 @@ function formValidation(form) {
 // loging logic implementation
 
 exports.getUserLoginPage = (req, res, next) => {
-    console.log('cookie---------->', req.get('Cookie'));
     res.render('login', {
         pageTitle: 'Login',
-        pagePath: '/api/login'
+        pagePath: '/api/login',
+        isAuth: req.session.isLoggedIn /* req.get('Cookie').split('=')[1] */
     });
 };
 
@@ -31,7 +31,8 @@ exports.postUserLoginPage = (req, res, next) => {
         .then(([data, fieldData]) => {
             console.log(data);
             if (data[0].password === req.body.psw) {
-                res.setHeader('Set-Cookie', 'loggedIn=true');
+                req.session.isLoggedIn = true
+                req.session.userId = data[0].id;
                 res.redirect('/');
             } else {
                 res.redirect('/404');
@@ -45,7 +46,8 @@ exports.postUserLoginPage = (req, res, next) => {
 exports.getUserRegistration = (req, res, next) => {
     res.render('signIn', {
         pageTitle: 'SignIn',
-        pagePath: '/api/singIn/'
+        pagePath: '/api/singIn/',
+        isAuth: req.session.isLoggedIn
     })
 };
 
@@ -58,6 +60,16 @@ exports.postUserRegistration = (req, res, next) => {
         .catch(e => console.error(e, 'Error on Post user form'));
     res.redirect('/api/login');
 };
+
+/* Setting up action when a user hit Logout 
+	by deleting the session coockie in the DB
+ */
+exports.getLogout = (req, res, next) => {
+    req.session.destroy(err => {
+        if (err) console.error(err);
+        res.redirect('/');
+    })
+}
 
 //TODO FIX THIS DOESN NEED THIS PART
 // exports.userDb = UserDb;

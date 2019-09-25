@@ -11,18 +11,21 @@ exports.getImages = (req, res, next) => {
             pageTitle: 'Image Details',
             pagePath: '/images',
             mainImg: images[0],
-            imgs: images
+            imgs: images,
+            isAuth: req.session.isLoggedIn
         });
     });
 };
 
 
 exports.displayImages = (req, res, next) => {
-    ImageClass.fetchBinary(uid, images => {
+    ImageClass.fetchAll(images => {
         res.render('index', {
             pageTitle: 'Welcome To Tof-Tof',
             pagePath: '/',
-            imgs: images
+            imgs: images,
+            isAuth: req.session.isLoggedIn,
+            userId: req.session.userId
         });
     });
 };
@@ -41,7 +44,8 @@ exports.getImageDetails = (req, res, next) => {
                 pageTitle: 'Image Details',
                 pagePath: '/images',
                 imgs: images,
-                mainImg: imgs
+                mainImg: imgs,
+                isAuth: req.session.isLoggedIn
             });
         } else {
             res.redirect('/404')

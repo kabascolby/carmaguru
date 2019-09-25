@@ -63,6 +63,28 @@ module.exports = class Images {
             .catch(e => console.error(e));
     }
 
+    static fetchAll(cb) {
+        /* Join two tables images and users to return all the images in a single array */
+        var sql = `SELECT *
+		FROM users u
+		JOIN images i
+		ON u.id = i.user_id`
+
+        db.execute(sql)
+            .then(([userImgs, fieldData]) => {
+                let imgsPromises = [];
+
+                for (var imgProm of userImgs) {
+                    imgsPromises.push(converToB64(imgProm));
+                }
+
+                Promise.all(imgsPromises)
+                    .then(imgs => cb(imgs))
+                    .catch(e => cb([]));
+            })
+            .catch(e => console.log(e));
+    }
+
     static updateImg(uId, imgId) {
         var sql = `UPDATE images 
 			SET modif_date=NOW()
