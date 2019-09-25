@@ -1,5 +1,6 @@
 const fs = require('fs');
 const Stream = require('stream');
+const fsPromises = fs.promises;
 
 const ImageClass = require('../models/imagesDb');
 const path = require('path');
@@ -34,7 +35,7 @@ exports.postImages = (req, res, next) => {
     })
 
     req.on('end', () => {
-
+        
         var imgPath = path.join(
             path.dirname(process.mainModule.filename),
             'data',
@@ -55,7 +56,7 @@ exports.postImages = (req, res, next) => {
 
             const imgInfos = {
                 imgId: create_UUID(),
-                userId: buff.userId,
+                userId: req.session.userId,
                 modification: Date.now(),
                 path: imgPath,
                 fname: buff.status === 1 ? //save the filename later
@@ -91,8 +92,8 @@ exports.putImageUpdate = (req, res, next) => {
     req.on('end', () => {
         buff = Buffer.concat(buff).toString();
         buff = JSON.parse(buff);
-        // console.log(buff.id, buff.userId);
-        Promise.all([ImageClass.fetchImage(buff.userId, buff.id), ImageClass.updateImg(buff.userId, buff.id)])
+        // console.log(buff.id, req.session.userId);
+        Promise.all([ImageClass.fetchImage(req.session.userId, buff.id), ImageClass.updateImg(req.session.userId, buff.id)])
             .then(([
                 [
                     [{ path }]
@@ -117,7 +118,7 @@ exports.deleteImage = (req, res, next) => {
     req.on('end', () => {
         buff = Buffer.concat(buff).toString();
         buff = JSON.parse(buff);
-        ImageClass.deleteImg(buff.userId, buff.id, delPromises => {
+        ImageClass.deleteImg(req.session.userId, buff.id, delPromises => {
             Promise.all(delPromises)
                 .then(([data, fieldData]) => {
                     // console.log('--------------data----------->\n', data); /* It's possible to return the path here */
@@ -153,11 +154,24 @@ exports.postImageEdit = (req, res, next) => {
 
 
 function createImg(imgB64, p, cb) {
-    fs.writeFile(p, imgB64, { encoding: 'base64' }, (err) => {
-        if (err) {
-            cb(null);
-        }
-        cb('OK');
-        console.log('image created');
+    var dir = path.join(
+        path.dirname(process.mainModule.filename),
+        'data',
+        'img',
+    );
+    fsPromises.access(dir, fs.constants.R_OK | fs.constants.W_OK)
+    .then(() => {
+        
+        fs.writeFile(p, imgB64, { encoding: 'base64' }, (err) => {
+            if (err) {
+                cb(null);
+            }
+            cb('OK');
+            console.log('image created');
+        });
+    })
+    .catch(() =>{
+        console.error('cannot access')
+        fs.mkdirSync(dir, { recursive: true });
     });
 }

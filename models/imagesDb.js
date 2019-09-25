@@ -14,7 +14,7 @@ module.exports = class Images {
     save() {
         const sql = `INSERT INTO images
 			(id, user_id, fname, path, modif_date)
-			VALUES(?, ?, ?, ?, NOW())`
+			VALUES(?, ?, ?, ?, CURRENT_TIMESTAMP())`
         return db.execute(sql, [this.imgId, this.uId, this.fname, this.path]);
 
     }

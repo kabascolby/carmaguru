@@ -21,11 +21,11 @@ const app = express();
 //ToDO export this Later
 
 const options = {
-    host: '192.168.99.100',
-    port: '3308',
+    host: '127.0.0.1',
+    port: '3306',
     user: 'root',
     database: 'camagru',
-    password: 'lamine19'
+    password: 'Lamine@2019'
 }
 
 const sessionStore = new MySQLStore(options);
@@ -75,7 +75,9 @@ app.use(imagesRoute);
 
 app.use(errorController.get404);
 
-app.listen(PORT, (err) => {
+const server = app.listen(PORT, (err) => {
     if (err) console.log(err);
     console.log('Server running on http://localhost:' + PORT);
 })
+
+server.keepAliveTimeout = 0;

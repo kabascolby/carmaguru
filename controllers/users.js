@@ -1,3 +1,4 @@
+const bcrypt = require('bcryptjs');
 const UserDb = require('../models/usersDb');
 
 /*
@@ -17,10 +18,11 @@ function formValidation(form) {
 // loging logic implementation
 
 exports.getUserLoginPage = (req, res, next) => {
+    // console.log(req.get('Cookie'));
     res.render('login', {
         pageTitle: 'Login',
         pagePath: '/api/login',
-        isAuth: req.session.isLoggedIn /* req.get('Cookie').split('=')[1] */
+        isAuth: req.session.isLoggedIn
     });
 };
 
@@ -33,11 +35,16 @@ exports.postUserLoginPage = (req, res, next) => {
             if (data[0].password === req.body.psw) {
                 req.session.isLoggedIn = true
                 req.session.userId = data[0].id;
-                res.redirect('/');
+                /* Doing this below to make sure the session is saved before redirection */
+                req.session.save( err => {
+                    if(err) console.error(err);
+                    res.redirect('/');
+                })
+
             } else {
                 res.redirect('/404');
             }
-        }).catch(e => res.redirect('/404'))
+        }).catch(e => res.redirect('/404'));
 };
 
 
@@ -54,11 +61,31 @@ exports.getUserRegistration = (req, res, next) => {
 exports.postUserRegistration = (req, res, next) => {
     let form = req.body;
     formValidation(form);
-    const userDb = new UserDb(form);
-    //TODO CHECK IF USERNAME ALREADY EXIST
-    userDb.save()
-        .catch(e => console.error(e, 'Error on Post user form'));
-    res.redirect('/api/login');
+    /* Checking if the user already exist */
+    UserDb.fetchUser(form.username)
+    .then(([[user]]) => {
+        /* if there is an availaible user return to Signup page again */
+        if(user){
+            console.error(new Error('User already exit\n'))
+            return res.redirect('/api/signIn');
+        }
+        
+        /* Encrypting password with salt bcrypt is promesse so I return to make sure it's done */
+        return bcrypt.hash(form.psw, 12);
+        
+        /* Saving user credential in the database */
+    })
+    .then(hashedPsw => {
+        form.psw = hashedPsw;
+        const userDb = new UserDb(form);
+        return userDb.save()
+    })
+    .then( () => {
+        res.redirect('/api/login');     
+    })
+    .catch(e => {
+        console.error(e);
+    });
 };
 
 /* Setting up action when a user hit Logout 
