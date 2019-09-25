@@ -18,6 +18,7 @@
 					<div>
 						<p>filters</p>
 					</div>
+					<%if(isAuth) {%>
 						<div  class="box__actions">
 							<button  class="btn" id="capture">Capture</button>
 							<input class="btn" type="file" id="file-input" accept="image/*;capture=user">
@@ -27,6 +28,7 @@
 								<button  class="btn" id="save-img" disabled>Save</button>
 							<%}%>
 						</div>
+					<%}%>
 				</section>
 				<aside class="thumbnail-grid" id="img-grid">
 				 <%for(let i of imgs){%>

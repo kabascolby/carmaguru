@@ -12,7 +12,6 @@ module.exports = class Images {
     }
 
     save() {
-        console.log(this);
         const sql = `INSERT INTO images
 			(id, user_id, fname, path, modif_date)
 			VALUES(?, ?, ?, ?, CURRENT_TIMESTAMP())`

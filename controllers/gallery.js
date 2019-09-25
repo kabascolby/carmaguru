@@ -56,7 +56,7 @@ exports.postImages = (req, res, next) => {
 
             const imgInfos = {
                 imgId: create_UUID(),
-                userId: buff.userId,
+                userId: req.session.userId,
                 modification: Date.now(),
                 path: imgPath,
                 fname: buff.status === 1 ? //save the filename later
@@ -66,7 +66,6 @@ exports.postImages = (req, res, next) => {
             const imagesDb = new ImageClass(imgInfos);
             imagesDb.save()
                 .then((data, fieldData) => {
-                    console.log(data);
                     if (!data[0].warningStatus) {
                         res.send({
                             id: imgInfos.imgId,
@@ -93,8 +92,8 @@ exports.putImageUpdate = (req, res, next) => {
     req.on('end', () => {
         buff = Buffer.concat(buff).toString();
         buff = JSON.parse(buff);
-        // console.log(buff.id, buff.userId);
-        Promise.all([ImageClass.fetchImage(buff.userId, buff.id), ImageClass.updateImg(buff.userId, buff.id)])
+        // console.log(buff.id, req.session.userId);
+        Promise.all([ImageClass.fetchImage(req.session.userId, buff.id), ImageClass.updateImg(req.session.userId, buff.id)])
             .then(([
                 [
                     [{ path }]
@@ -119,7 +118,7 @@ exports.deleteImage = (req, res, next) => {
     req.on('end', () => {
         buff = Buffer.concat(buff).toString();
         buff = JSON.parse(buff);
-        ImageClass.deleteImg(buff.userId, buff.id, delPromises => {
+        ImageClass.deleteImg(req.session.userId, buff.id, delPromises => {
             Promise.all(delPromises)
                 .then(([data, fieldData]) => {
                     // console.log('--------------data----------->\n', data); /* It's possible to return the path here */
