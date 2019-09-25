@@ -35,7 +35,7 @@ exports.postImages = (req, res, next) => {
     })
 
     req.on('end', () => {
-        
+
         var imgPath = path.join(
             path.dirname(process.mainModule.filename),
             'data',
@@ -159,19 +159,20 @@ function createImg(imgB64, p, cb) {
         'data',
         'img',
     );
+    /* Using experimental fs promises */
     fsPromises.access(dir, fs.constants.R_OK | fs.constants.W_OK)
-    .then(() => {
-        
-        fs.writeFile(p, imgB64, { encoding: 'base64' }, (err) => {
-            if (err) {
-                cb(null);
-            }
-            cb('OK');
-            console.log('image created');
+        .then(() => {
+
+            fs.writeFile(p, imgB64, { encoding: 'base64' }, (err) => {
+                if (err) {
+                    cb(null);
+                }
+                cb('OK');
+                console.log('image created');
+            });
+        })
+        .catch(() => {
+            console.error('cannot access')
+            fs.mkdirSync(dir, { recursive: true });
         });
-    })
-    .catch(() =>{
-        console.error('cannot access')
-        fs.mkdirSync(dir, { recursive: true });
-    });
 }
