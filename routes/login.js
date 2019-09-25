@@ -8,6 +8,8 @@ router.get('/login', usersController.getUserLoginPage);
 
 router.post('/login', usersController.postUserLoginPage);
 
+router.get('/logout', usersController.getLogout);
+
 /* [ kabascolby: { first: 'Lamine',
 last: 'Kaba',
 username: 'kabascolby',

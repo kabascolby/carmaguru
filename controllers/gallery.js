@@ -5,18 +5,19 @@ const fsPromises = fs.promises;
 const ImageClass = require('../models/imagesDb');
 const path = require('path');
 const create_UUID = require('../utility/util').create_UUID;
-const tempId = 'd3a9a91e-d4ed-11e9-85d5-0242ac110002';
+// const tempId = 'd3a9a91e-d4ed-11e9-85d5-0242ac110002';
 
 // create unique identifer of an image
 
 
 exports.getGallery = (req, res, next) => {
-    ImageClass.fetchBinary(tempId, userImgs => {
+    ImageClass.fetchBinary(req.session.userId, userImgs => {
         res.render('gallery', {
             pageTitle: 'Gallery Studio',
             pagePath: '/gallery',
             imgs: userImgs,
             edit: undefined,
+            isAuth: req.session.isLoggedIn
         });
     })
 };
@@ -132,7 +133,10 @@ exports.deleteImage = (req, res, next) => {
 
 exports.postImageEdit = (req, res, next) => {
     const imgId = req.body.imgId;
-    ImageClass.fetchBinary(tempId, userImgs => {
+    /* 
+    	Giving the userId
+     */
+    ImageClass.fetchBinary(req.session.userId, userImgs => {
         let img = userImgs.find(img => img.id === imgId);
         // let toEdit = `<img src=data:image/png;base64,${img.path} id=${img.id} class="thumbnail" alt={img.fname}>`;
         if (img) {
@@ -140,7 +144,8 @@ exports.postImageEdit = (req, res, next) => {
                 pageTitle: 'Update Images',
                 pagePath: '/gallery',
                 imgs: userImgs,
-                edit: img
+                edit: img,
+                isAuth: req.session.isLoggedIn
             });
         } else {
             res.redirect('/404');

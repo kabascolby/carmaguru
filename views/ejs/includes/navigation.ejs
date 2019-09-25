@@ -6,8 +6,11 @@
         <ul class="menu">
             <li><a class="<%= pagePath === '/' ? 'active' : '' %>" href="/">Home</a></li>
             <li><a class="<%= pagePath === '/gallery' ? 'active' : '' %>" href="/gallery">Gallery</a></li>
-            <li><a class="<%= pagePath === '/api/login' ? 'active' : '' %>" href=" /api/login ">Login</a></li>
-            <li><a class="logout_active " href="/logout ">logout</a></li>
+			<% if(isAuth) { %>
+            	<li><a href="/api/logout ">logout</a></li>
+			<%} else {%>
+            	<li><a class="<%= pagePath === '/api/login' ? 'active' : '' %>" href=" /api/login ">Login</a></li>
+			<%}%>
         </ul>
     </nav>
     <label for="nav-toggle " class="nav-toggle-label ">
