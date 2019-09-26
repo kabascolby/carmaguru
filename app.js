@@ -63,7 +63,16 @@ app.use(session({
 }));
 /* _____________________________________________________________________________ */
 
+/* adding a Data availaible in all the views
+	creating a middleware
+	_____________________________________________________________________________
+*/
+app.use((req, res, next) => {
+    res.locals.isAuth = req.session.isLoggedIn;
+    next();
+});
 
+/* _____________________________________________________________________________ */
 app.use(mainRoute);
 app.use(userRoute);
 app.use('/api/', adminRoute);

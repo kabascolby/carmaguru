@@ -22,7 +22,6 @@ exports.getUserLoginPage = (req, res, next) => {
     res.render('login', {
         pageTitle: 'Login',
         pagePath: '/api/login',
-        isAuth: req.session.isLoggedIn
     });
 };
 
@@ -58,7 +57,6 @@ exports.getUserRegistration = (req, res, next) => {
     res.render('signIn', {
         pageTitle: 'SignIn',
         pagePath: '/api/singIn/',
-        isAuth: req.session.isLoggedIn
     })
 };
 

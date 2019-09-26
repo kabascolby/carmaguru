@@ -7,7 +7,6 @@ exports.getAdmin = (req, res, next) => {
             pageTitle: 'admin',
             pagePath: '/api/admin',
             users: data,
-            isAuth: req.session.isLoggedIn
         });
     })
 }

@@ -17,7 +17,6 @@ exports.getGallery = (req, res, next) => {
             pagePath: '/gallery',
             imgs: userImgs,
             edit: undefined,
-            isAuth: req.session.isLoggedIn
         });
     })
 };
@@ -144,7 +143,6 @@ exports.postImageEdit = (req, res, next) => {
                 pagePath: '/gallery',
                 imgs: userImgs,
                 edit: img,
-                isAuth: req.session.isLoggedIn
             });
         } else {
             res.redirect('/404');
