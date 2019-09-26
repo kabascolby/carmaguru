@@ -19,9 +19,6 @@ function formValidation(form) {
 
 exports.getUserLoginPage = (req, res, next) => {
     // console.log(req.get('Cookie'));
-    /* implementing route protection to redirect the user if is already loggedin */
-    if (req.session.isLoggedIn)
-        return res.redirect('/');
     res.render('login', {
         pageTitle: 'Login',
         pagePath: '/api/login',
@@ -58,8 +55,6 @@ exports.postUserLoginPage = (req, res, next) => {
 // signin Logic implementation
 
 exports.getUserRegistration = (req, res, next) => {
-    if (req.session.isLoggedIn)
-        return res.redirect('/');
     res.render('signIn', {
         pageTitle: 'SignIn',
         pagePath: '/api/singIn/',

@@ -1,10 +1,11 @@
 const express = require('express');
 
 const usersController = require('../controllers/users');
+const isAuth = require('../utility/is-auth');
 
 const router = express.Router();
 
-router.get('/login', usersController.getUserLoginPage);
+router.get('/login', isAuth.isOn, usersController.getUserLoginPage);
 
 router.post('/login', usersController.postUserLoginPage);
 

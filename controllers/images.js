@@ -34,17 +34,20 @@ exports.displayImages = (req, res, next) => {
 /* 
 	displaying a single image informations (likes and comments)
 	also same user images
+
+	work to Do Here by changing by finding the user Id and and displaying all the  images belongin to that user
 */
+
 exports.getImageDetails = (req, res, next) => {
     const imgId = req.params.imageId;
-    ImageClass.fetchBinary(req.session.userId, images => {
-        let imgs = images.find(img => img.id === imgId);
-        if (imgs) {
+    ImageClass.findOneImgs(imgId, images => {
+        if (images) {
+            const img = images.find(img => img.id === imgId);
             res.render('images', {
                 pageTitle: 'Image Details',
                 pagePath: '/images',
                 imgs: images,
-                mainImg: imgs,
+                mainImg: img,
                 isAuth: req.session.isLoggedIn
             });
         } else {

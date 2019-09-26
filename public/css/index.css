@@ -37,10 +37,11 @@
 
 .box__actions {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: minmax(5px, auto);
+    grid-column-gap: 3%;
+    grid-auto-flow: column;
     padding: .4rem;
     text-align: center;
-    grid-gap: .3rem;
 }
 
 

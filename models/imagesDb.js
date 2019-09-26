@@ -1,6 +1,8 @@
 const fs = require('fs');
 const db = require('../utility/database');
 
+/* declaring a private function in my class */
+
 module.exports = class Images {
     constructor(imgInfos) {
         this.imgId = imgInfos.imgId;
@@ -32,6 +34,22 @@ module.exports = class Images {
 		WHERE user_id = ? AND id = ?`;
 
         return db.execute(sql, [uId, imgId]);
+    }
+
+    static findOneImgs(imgId, cb) {
+        getUserId(imgId)
+            .then(([
+                [data]
+            ]) => {
+                let userId = data.user_id;
+                this.fetchBinary(userId, data => {
+                    cb(data);
+                });
+            })
+            .catch(e => {
+                cb(null);
+                console.error(new Error('Invalide image Id', e));
+            });
     }
 
     static fetchBinary(userId, cb) {
@@ -85,12 +103,18 @@ module.exports = class Images {
             .catch(e => console.log(e));
     }
 
+
     static updateImg(uId, imgId) {
         var sql = `UPDATE images 
 			SET modif_date=NOW()
 			WHERE user_id = ? AND id = ?`;
         db.execute(sql, [uId, imgId]);
     }
+}
+
+function getUserId(imgId) {
+    var sql = `SELECT user_id FROM images Where id = ?`
+    return db.execute(sql, [imgId]);
 }
 
 /* Making the file deletion a  promise */

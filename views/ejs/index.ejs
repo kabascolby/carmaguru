@@ -19,12 +19,12 @@
 									<h2 class="image_infos">09c</h2>
 								</div>
 								<div class="box__actions">
-									<form action='/gallery/edit' method='POST'> 
-										<input type="hidden" name="imgId" value="<%= i.id %>">
 										<% if(isAuth && userId === i.user_id) { %>
-											<button type="submit" class="btn">Edit</button> 
+											<form action='/gallery/edit' method='POST'> 
+												<input type="hidden" name="imgId" value="<%= i.id %>">
+													<button type="submit" class="btn">Edit</button> 
+											</form>
 										<%}%>
-									</form>
 									<a href="/images/<%= i.id %>" class="btn">Details</a>
 								</div>
 							</article>

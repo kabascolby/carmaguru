@@ -78,7 +78,7 @@ exports.postImages = (req, res, next) => {
                 .catch(e => console.log(e));
         }));
     });
-}
+};
 
 exports.putImageUpdate = (req, res, next) => {
     /*
@@ -106,7 +106,7 @@ exports.putImageUpdate = (req, res, next) => {
             })
             .catch(e => console.error(e));
     });
-}
+};
 
 exports.deleteImage = (req, res, next) => {
 
@@ -127,7 +127,7 @@ exports.deleteImage = (req, res, next) => {
                 .catch(e => console.error(new Error('Failed to delete in the DataBase', e)));
         })
     });
-}
+};
 
 
 exports.postImageEdit = (req, res, next) => {
@@ -150,7 +150,7 @@ exports.postImageEdit = (req, res, next) => {
             res.redirect('/404');
         }
     })
-}
+};
 
 
 function createImg(imgB64, p, cb) {
