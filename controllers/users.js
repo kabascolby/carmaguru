@@ -11,7 +11,7 @@ function formValidation(form) {
     //check proprities to avoid breaking the code
     ['first', 'last', 'email', 'psw', 'username'].forEach(el => {
         if (form.hasOwnProperty(el) === false)
-            throw Error('Invalide form')
+            console.error(new Error('Invalide form'));
     })
 }
 
@@ -19,6 +19,9 @@ function formValidation(form) {
 
 exports.getUserLoginPage = (req, res, next) => {
     // console.log(req.get('Cookie'));
+    /* implementing route protection to redirect the user if is already loggedin */
+    if (req.session.isLoggedIn)
+        return res.redirect('/');
     res.render('login', {
         pageTitle: 'Login',
         pagePath: '/api/login',
@@ -27,30 +30,36 @@ exports.getUserLoginPage = (req, res, next) => {
 };
 
 exports.postUserLoginPage = (req, res, next) => {
-    const user = req.body;
-    console.log(req.body)
-    UserDb.fetchUser(req.body.username)
-        .then(([data, fieldData]) => {
-            console.log(data);
-            if (data[0].password === req.body.psw) {
+    const username = req.body.username;
+    const password = req.body.psw;
+    UserDb.fetchUser(username)
+        .then(([
+            [data]
+        ]) => bcrypt.compare(password, data.password).then(match => {
+            if (match) {
+                req.session.userId = data.id;
                 req.session.isLoggedIn = true
-                req.session.userId = data[0].id;
-                /* Doing this below to make sure the session is saved before redirection */
-                req.session.save( err => {
-                    if(err) console.error(err);
+                    /* Making sure the session is saved before redirection */
+                req.session.save(err => {
+                    if (err) console.error(err);
                     res.redirect('/');
                 })
-
             } else {
-                res.redirect('/404');
+                res.redirect('/api/login');
             }
-        }).catch(e => res.redirect('/404'));
+        })) /* Returning the result of comparing a password  which is a promesse*/
+        .catch(() => {
+            console.error(new Error('Invalide User'));
+            res.redirect('/api/login');
+        });
 };
 
 
 // signin Logic implementation
 
 exports.getUserRegistration = (req, res, next) => {
+    if (req.session.isLoggedIn)
+        return res.redirect('/');
     res.render('signIn', {
         pageTitle: 'SignIn',
         pagePath: '/api/singIn/',
@@ -63,29 +72,30 @@ exports.postUserRegistration = (req, res, next) => {
     formValidation(form);
     /* Checking if the user already exist */
     UserDb.fetchUser(form.username)
-    .then(([[user]]) => {
-        /* if there is an availaible user return to Signup page again */
-        if(user){
-            console.error(new Error('User already exit\n'))
-            return res.redirect('/api/signIn');
-        }
-        
-        /* Encrypting password with salt bcrypt is promesse so I return to make sure it's done */
-        return bcrypt.hash(form.psw, 12);
-        
-        /* Saving user credential in the database */
-    })
-    .then(hashedPsw => {
-        form.psw = hashedPsw;
-        const userDb = new UserDb(form);
-        return userDb.save()
-    })
-    .then( () => {
-        res.redirect('/api/login');     
-    })
-    .catch(e => {
-        console.error(e);
-    });
+        .then(([
+            [user]
+        ]) => {
+            /* if there is an availaible user return to Signup page again */
+            if (user) {
+                console.error(new Error('User already exit\n'))
+                return res.redirect('/api/signIn');
+            }
+
+            /* Encrypting password with salt bcrypt is promesse so I return to make sure it's done */
+            return bcrypt.hash(form.psw, 12)
+                .then(hashedPsw => {
+                    form.psw = hashedPsw;
+                    const userDb = new UserDb(form);
+                    /* Saving user credential in the database */
+                    return userDb.save();
+                })
+                .then(() => {
+                    res.redirect('/api/login');
+                })
+        })
+        .catch(e => {
+            console.error(e);
+        });
 };
 
 /* Setting up action when a user hit Logout 
