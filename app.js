@@ -9,6 +9,11 @@ const session = require('express-session');
 */
 const MySQLStore = require('express-mysql-session')(session);
 
+/*
+	sending temporary message to the frontend to display information to users
+ */
+const flash = require('connect-flash');
+
 const db = require('./utility/database');
 
 const PORT = 8080;
@@ -63,12 +68,23 @@ app.use(session({
 }));
 /* _____________________________________________________________________________ */
 
+
+/*
+	creating the falsh message middleware;
+	_____________________________________________________________________________
+ */
+
+app.use(flash());
+/* _____________________________________________________________________________ */
+
+
 /* adding a Data availaible in all the views
 	creating a middleware
 	_____________________________________________________________________________
 */
 app.use((req, res, next) => {
     res.locals.isAuth = req.session.isLoggedIn;
+    res.locals.errorMessage = req.flash('error');
     next();
 });
 

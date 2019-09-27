@@ -41,11 +41,13 @@ exports.postUserLoginPage = (req, res, next) => {
                     res.redirect('/');
                 })
             } else {
+                req.flash('error', 'Invalide User credentials');
                 res.redirect('/api/login');
             }
-        })) /* Returning the result of comparing a password  which is a promesse*/
+        })) /* Returning the result of comparing a password  which is a promesses*/
         .catch(() => {
             console.error(new Error('Invalide User'));
+            req.flash('error', 'Invalide User credentials');
             res.redirect('/api/login');
         });
 };
@@ -57,6 +59,7 @@ exports.getUserRegistration = (req, res, next) => {
     res.render('signIn', {
         pageTitle: 'SignIn',
         pagePath: '/api/singIn/',
+        // errorMessage: req.flash('error')
     })
 };
 
@@ -71,6 +74,7 @@ exports.postUserRegistration = (req, res, next) => {
             /* if there is an availaible user return to Signup page again */
             if (user) {
                 console.error(new Error('User already exit\n'))
+                req.flash('error', 'Username already taken please try another one');
                 return res.redirect('/api/signIn');
             }
 

@@ -6,7 +6,10 @@
     <body>
         <%-include('includes/navigation') %>
             <div class="content">
-				<<main>
+				<main>
+					<%if(errorMessage.length){%>
+						<div class="user-message user-message--error" style="visibility: hidden;"><%=errorMessage%></div>
+					<%}%>
 					<form action="/api/signIn" method="POST">
 						<div class="container">
 							<h1>Register</h1>

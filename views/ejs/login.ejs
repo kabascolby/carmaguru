@@ -7,6 +7,9 @@
         <%-include('includes/navigation') %>
             <div class="content">
 				<main>
+					<%if(errorMessage.length){%>
+						<div class="user-message user-message--error" style="visibility: hidden;"><%=errorMessage%></div>
+					<%}%>
 					<form action="/api/login" method="POST">
 						<label for="username"><b>Username</b></label>
 						<input type="text" placeholder="Enter your username" name="username"><br>

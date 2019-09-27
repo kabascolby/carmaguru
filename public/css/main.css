@@ -167,13 +167,32 @@ nav a:hover {
     display: none;
 }
 
+.user-message {
+    visibility: visible !important;
+    margin: auto;
+    width: 90%;
+    color: #f1f1f1;
+    border: 1px solid rgba(0, 0, 255, 0.753);
+    padding: 0.8rem;
+    text-align: center;
+    background: rgba(251, 251, 255, 0.842);
+    transition-property: visibility;
+    transition-delay: 300ms;
+    transition-timing-function: ease-in-out;
+}
+
+.user-message--error {
+    border-color: red;
+    background: rgba(255, 0, 0, 0.507);
+}
+
 
 /* 
 	for future project
 	https://www.youtube.com/watch?v=8QKOaTYvYUA
 */
 
-@media screen and (min-width: 800px) {
+@media screen and (min-width: 768px) {
     .logo_title {
         display: flex;
         align-items: center;
@@ -221,5 +240,8 @@ nav a:hover {
     nav li {
         margin-left: 3em;
         margin-bottom: 0;
+    }
+    .user-message {
+        width: 30rem;
     }
 }
