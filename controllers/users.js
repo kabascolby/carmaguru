@@ -1,5 +1,6 @@
 const bcrypt = require('bcryptjs');
 const UserDb = require('../models/usersDb');
+const sgMail = require('../utility/mail');
 
 /*
  ** Because the login and the signing API belong to user that why 
@@ -88,6 +89,21 @@ exports.postUserRegistration = (req, res, next) => {
                 })
                 .then(() => {
                     res.redirect('/api/login');
+
+                    const msg = {
+                        to: form.email,
+                        from: 'info@camagru.com',
+                        subject: 'Signup succesfull',
+                        text: 'and easy to do anywhere, even with Node.js',
+                        html: `<h2>Hi ${form.first}  ${form.last} You're on your way!</h2>
+						<h3>Welcom to IDID made by Lamine Kaba</h3>
+						<h3>You successfully signed up!</h3>
+						<h3>Singin and upload your images</h3>
+						`,
+                    };
+                    sgMail.send(msg, (err) => {
+                        console.log('error --------------->', err)
+                    });
                 })
         })
         .catch(e => {

@@ -45,12 +45,10 @@ const imagesRoute = require('./routes/images');
 const adminRoute = require('./routes/admin');
 const errorController = require('./controllers/error');
 const creation = require('./utility/schema');
-
 app.use(bodyparser.urlencoded({ limit: '50mb', extended: true }));
 app.use(bodyparser.json({ limit: '50mb', extended: true }));
 
-// db.execute(' SELECT *, BIN_TO_UUID(id) id FROM users').then(data => console.log(data[0]));
-// db.execute('SHOW tables').then(data => console.log(data[0]));
+
 app.set('view engine', 'ejs');
 app.set('views', 'views/ejs');
 
