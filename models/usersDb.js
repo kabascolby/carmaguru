@@ -61,6 +61,10 @@ module.exports = class User {
 		`);
     }
 
+    static updatePassword(userId, newPassword) {
+        return db.execute(`UPDATE users SET password=? WHERE id=?`, [newPassword, userId])
+    }
+
     static fetchAll() {
         return db.execute(`SELECT * FROM users`);
     }

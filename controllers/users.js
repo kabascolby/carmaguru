@@ -47,7 +47,7 @@ exports.postUserLoginPage = (req, res, next) => {
                 req.flash('error', 'Invalide User credentials');
                 res.redirect('/api/login');
             }
-        })) /* Returning the result of comparing a password  which is a promesses*/
+        })) /* Returning the users of comparing a password  which is a promesses*/
         .catch(() => {
             console.error(new Error('Invalide User'));
             req.flash('error', 'Invalide User credentials');
@@ -124,12 +124,16 @@ exports.getLogout = (req, res, next) => {
     })
 }
 
+
+/* ------------------------------------------------- Reset user Password ------------------------------------------------ */
+
 exports.getReset = (req, res, next) => {
     res.render('reset', {
         pageTitle: 'Reset Password',
         pagePath: '/api/reset/',
     })
 }
+
 
 exports.postReset = (req, res, next) => {
     const email = req.body.email;
@@ -154,8 +158,8 @@ exports.postReset = (req, res, next) => {
                 const tokenDb = new TokenDb(token, user.id);
                 return tokenDb.save()
             })
-            .then(([result]) => {
-                if (result.warningStatus) {
+            .then(([users]) => {
+                if (users.warningStatus) {
                     console.error(new Error('Insertion in the DB FAIL', e));
                     res.redirect('/api/reset');
                 }
@@ -184,6 +188,65 @@ exports.postReset = (req, res, next) => {
             });
     })
 }
+
+/* ______________________________________________________________________________________________________________________ */
+
+
+
+/* ------------------------------------------------- Reset user Password ----------------------------------------------- */
+
+exports.getNewPassword = (req, res, next) => {
+    const token = req.params.token;
+    TokenDb.fetchUserToken(token)
+        .then(([
+            [user]
+        ]) => {
+            if (!user) {
+                req.flash('error', '😞Invalide request or Request Expire');
+                return res.redirect('/api/login');
+            }
+            res.render('new-password', {
+                pageTitle: 'Update password',
+                pagePath: '/api/new-password',
+                userId: user.id,
+                token: user.token
+            })
+        })
+        .catch(e => console.error(e));
+}
+
+
+
+
+exports.postNewPassword = (req, res, next) => {
+    const newPassword = req.body.password;
+    const userId = req.body.userId;
+    const token = req.body.token;
+    TokenDb.fetchUserAndToken(token, userId)
+        .then(([
+            [user]
+        ]) => {
+            if (!user) {
+                req.flash('error', '😞Request Expire get a new link');
+                return res.redirect('/api/reset');
+            }
+            return bcrypt.hash(newPassword, 12)
+        })
+        .then(hashedPsw => {
+            return UserDb.updatePassword(userId, hashedPsw);
+        })
+        .then(([result]) => {
+            if (result.warningStatus !== 0) {
+                req.flash('error', '😞Server error try later');
+                return res.redirect('/api/reset/' + token);
+            }
+            res.redirect('/api/login');
+            TokenDb.destroy(token);
+        })
+        .catch(e => console.error(e));
+}
+
+/* ______________________________________________________________________________________________________________________ */
 
 //TODO FIX THIS DOESN NEED THIS PART
 // exports.userDb = UserDb;

@@ -13,14 +13,7 @@ router.get('/logout', usersController.getLogout);
 
 router.get('/reset', usersController.getReset);
 router.post('/reset', usersController.postReset);
-
-
-/* [ kabascolby: { first: 'Lamine',
-last: 'Kaba',
-username: 'kabascolby',
-email: 'brianbixby0@gmail.com',
-psw: 'foodfood',
-submit: 'Register' } ] */
-
+router.get('/reset/:token', isAuth.isOn, usersController.getNewPassword);
+router.post('/new-password', usersController.postNewPassword);
 
 module.exports = router;

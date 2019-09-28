@@ -13,9 +13,23 @@ module.exports = class Token {
         return db.execute(sql, [this.token, this.userId]);
     }
 
-    // static getUserNames() {
-    //     return db.execute(`SELECT username FROM users`);
-    // }
+    static fetchUserToken(token) {
+        var sql = `SELECT id, token, firstname, lastname, email, expire
+		FROM tokens t
+		JOIN users u
+		ON u.id = t.user_id
+		WHERE token=? AND expire > NOW()`
+        return db.execute(sql, [token]);
+    }
+
+    static fetchUserAndToken(token, userId) {
+        var sql = `SELECT id, token, firstname, lastname, email, expire
+		FROM tokens t
+		JOIN users u
+		ON u.id = t.user_id
+		WHERE token=? AND id=? AND expire > NOW()`
+        return db.execute(sql, [token, userId]);
+    }
 
     // static fetchUser(userName) {
     //     return db.execute(`Select *
@@ -24,7 +38,7 @@ module.exports = class Token {
     // 	`);
     // }
 
-    // static fetchAll() {
-    //     return db.execute(`SELECT * FROM users`);
-    // }
+    static destroy(token) {
+        return db.execute(`DELETE FROM tokens WHERE token=?`, [token]);
+    }
 }
