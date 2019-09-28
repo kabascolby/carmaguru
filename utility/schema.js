@@ -38,12 +38,31 @@ function createImageTable() {
     ).catch(e => console.log(e));
 }
 
+
+function createTokentable() {
+    const sql = `CREATE TABLE IF NOT EXISTS tokens (
+		token varchar(100) NOT NULL PRIMARY KEY,
+		user_id varchar(36) NOT NULL,
+		expire TIMESTAMP NOT NULL,
+		reg_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+	  )ENGINE=InnoDB DEFAULT CHARSET=utf8`;
+
+    db.execute(sql).then(data => data[0].warningStatus === 0 ?
+        console.log('token table Created') : server.userStatus = 0
+    ).catch(e => console.log(e));
+}
+
+
 if (server.userStatus) {
     createUserstable();
 }
 
 if (server.imgStatus) {
     createImageTable();
+}
+
+if (server.userStatus) {
+    createTokentable();
 }
 
 // http://www.mysqltutorial.org/mysql-uuid/

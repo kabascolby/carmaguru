@@ -11,6 +11,10 @@ router.post('/login', usersController.postUserLoginPage);
 
 router.get('/logout', usersController.getLogout);
 
+router.get('/reset', usersController.getReset);
+router.post('/reset', usersController.postReset);
+
+
 /* [ kabascolby: { first: 'Lamine',
 last: 'Kaba',
 username: 'kabascolby',

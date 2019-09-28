@@ -1,6 +1,8 @@
 const bcrypt = require('bcryptjs');
 const UserDb = require('../models/usersDb');
+const TokenDb = require('../models/tokenDb');
 const sgMail = require('../utility/mail');
+const crypto = require('crypto');
 
 /*
  ** Because the login and the signing API belong to user that why 
@@ -97,12 +99,12 @@ exports.postUserRegistration = (req, res, next) => {
                         text: 'and easy to do anywhere, even with Node.js',
                         html: `<h2>Hi ${form.first}  ${form.last} You're on your way!</h2>
 						<h3>Welcom to IDID made by Lamine Kaba</h3>
-						<h3>You successfully signed up!</h3>
-						<h3>Singin and upload your images</h3>
-						`,
+						<p>You successfully signed up!</p>
+						<p>Singin and upload your images</p>`,
                     };
                     sgMail.send(msg, (err) => {
-                        console.log('error --------------->', err)
+                        if (err)
+                            console.error('error --------------->', err)
                     });
                 })
         })
@@ -111,13 +113,75 @@ exports.postUserRegistration = (req, res, next) => {
         });
 };
 
-/* Setting up action when a user hit Logout 
+/* 
+	Setting up action when a user hit Logout 
 	by deleting the session coockie in the DB
- */
+*/
 exports.getLogout = (req, res, next) => {
     req.session.destroy(err => {
         if (err) console.error(err);
         res.redirect('/');
+    })
+}
+
+exports.getReset = (req, res, next) => {
+    res.render('reset', {
+        pageTitle: 'Reset Password',
+        pagePath: '/api/reset/',
+    })
+}
+
+exports.postReset = (req, res, next) => {
+    const email = req.body.email;
+    const username = req.body.username;
+    var userInfos;
+    crypto.randomBytes(32, (err, buffer) => {
+        if (err) {
+            console.error(new Error('Error getting the token', err));
+            return res.redirect('/api/reset')
+        }
+        const token = buffer.toString('hex');
+        UserDb.fetchUser(username)
+            .then(([
+                [user]
+            ]) => {
+                if (!user || user.email !== email) {
+                    req.flash('error', 'Invalide User credentials');
+                    res.redirect('/api/reset');
+                }
+
+                userInfos = user;
+                const tokenDb = new TokenDb(token, user.id);
+                return tokenDb.save()
+            })
+            .then(([result]) => {
+                if (result.warningStatus) {
+                    console.error(new Error('Insertion in the DB FAIL', e));
+                    res.redirect('/api/reset');
+                }
+
+                res.redirect('/api/login');
+                const msg = {
+                    to: email,
+                    from: 'info@camagru.com',
+                    subject: 'Password reset',
+                    html: `<h2>Hi ${userInfos.firstname}  ${userInfos.lastname}</h2>
+                	<h3>You requested a password reset</h3>
+                	<p>Click this <a href="http://localhost:8080/api/reset/${token}</a> to set a new password</p>
+                	<p>Singin and upload your images</p>`,
+                };
+
+                sgMail.send(msg, (err) => {
+                    if (err)
+                        console.error('error email reset--------------->', err)
+                });
+
+            })
+            .catch((e) => {
+                console.error(new Error('Error retriving user data', e));
+                req.flash('error', 'Server Error please try later');
+                // res.redirect('/api/reset');
+            });
     })
 }
 
