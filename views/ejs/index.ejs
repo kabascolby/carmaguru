@@ -30,6 +30,15 @@
 							</article>
 						<%}%>
 					</div>
+					<%-include('includes/pagination', {
+						currentPage,
+						previousPage,
+						hasPreviousPage,
+						hasNextPage,
+						nextPage,
+						lastPage
+					})%>
+
 				</main>
 			</div>
     <%-include('includes/end')%>

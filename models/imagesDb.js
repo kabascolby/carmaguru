@@ -30,7 +30,7 @@ module.exports = class Images {
     }
 
     static fetchImage(uId, imgId) {
-        var sql = `SELECT path FROM images
+        const sql = `SELECT path FROM images
 		WHERE user_id = ? AND id = ?`;
 
         return db.execute(sql, [uId, imgId]);
@@ -83,10 +83,11 @@ module.exports = class Images {
 
     static fetchAll(cb) {
         /* Join two tables images and users to return all the images in a single array */
-        var sql = `SELECT *
+        const sql = `SELECT *
 		FROM users u
 		JOIN images i
-		ON u.id = i.user_id`
+		ON u.id = i.user_id 
+		ORDER BY create_date DESC`
 
         db.execute(sql)
             .then(([userImgs, fieldData]) => {
@@ -104,8 +105,35 @@ module.exports = class Images {
     }
 
 
+    static fetchPerPage(offset, itemsPerPage, cb) {
+        /* Join two tables images and users to return all the images in a single array */
+        const sql = `SELECT *
+		FROM users u
+		JOIN images i
+		ON u.id = i.user_id 
+		ORDER BY create_date DESC
+		LIMIT ?, ?`
+        db.execute(sql, [offset, itemsPerPage])
+            .then(([userImgs, fieldData]) => {
+                let imgsPromises = [];
+
+                for (var imgProm of userImgs) {
+                    imgsPromises.push(converToB64(imgProm));
+                }
+
+                Promise.all(imgsPromises)
+                    .then(imgs => cb(imgs))
+                    .catch(e => cb([]));
+            })
+            .catch(e => console.log(e));
+    }
+
+    static totalItems() {
+        return db.execute(`SELECT COUNT(id) as total 
+		FROM images`);
+    }
     static updateImg(uId, imgId) {
-        var sql = `UPDATE images 
+        const sql = `UPDATE images 
 			SET modif_date=NOW()
 			WHERE user_id = ? AND id = ?`;
         db.execute(sql, [uId, imgId]);
@@ -113,7 +141,7 @@ module.exports = class Images {
 }
 
 function getUserId(imgId) {
-    var sql = `SELECT user_id FROM images Where id = ?`
+    const sql = `SELECT user_id FROM images Where id = ?`
     return db.execute(sql, [imgId]);
 }
 

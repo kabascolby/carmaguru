@@ -3,6 +3,6 @@ const imagesController = require('../controllers/images');
 
 const router = express.Router();
 
-router.get('/', imagesController.displayImages);
+router.get('/', imagesController.getIndex);
 
 module.exports = router;

@@ -1,9 +1,8 @@
 const path = require('path');
 const mainPath = require('../utility/path');
 const ImageClass = require('../models/imagesDb');
-// const uid = 'd3a9a91e-d4ed-11e9-85d5-0242ac110002';
-
-
+const ITEMS_PER_PAGE = 9;
+let totalItems;
 
 exports.getImages = (req, res, next) => {
     ImageClass.fetchBinary(req.session.userId, images => {
@@ -17,15 +16,32 @@ exports.getImages = (req, res, next) => {
 };
 
 
-exports.displayImages = (req, res, next) => {
-    ImageClass.fetchAll(images => {
-        res.render('index', {
-            pageTitle: 'Welcome To Tof-Tof',
-            pagePath: '/',
-            imgs: images,
-            userId: req.session.userId
-        });
-    });
+exports.getIndex = (req, res, next) => {
+
+    ImageClass.totalItems()
+        .then(([
+            [numItems]
+        ]) => {
+            totalItems = numItems.total;
+            const page = Math.abs(req.query.page) || 1;
+            const skip = (page - 1) * ITEMS_PER_PAGE;
+            ImageClass.fetchPerPage(skip, ITEMS_PER_PAGE, (images) => {
+                res.render('index', {
+                    pageTitle: 'Welcome To Tof-Tof',
+                    pagePath: '/',
+                    imgs: images,
+                    userId: req.session.userId,
+                    totalItems,
+                    currentPage: page,
+                    hasNextPage: (ITEMS_PER_PAGE * page) < totalItems,
+                    hasPreviousPage: page > 1,
+                    nextPage: page + 1,
+                    previousPage: page - 1,
+                    lastPage: Math.ceil(totalItems / ITEMS_PER_PAGE)
+                });
+            });
+        })
+        .catch(e => console.error(e));
 };
 
 
