@@ -1,6 +1,7 @@
 const db = require('../utility/database');
 module.exports = class Comments {
-    constructor(userId, imgId, comment) {
+    constructor(id, userId, imgId, comment) {
+        this.id = id;
         this.userId = userId;
         this.imgId = imgId;
         this.comment = comment;
@@ -9,19 +10,31 @@ module.exports = class Comments {
     save() {
         let credentials = `INSERT INTO comments 
 			(id, user_id, img_id, message)
-			VALUES(UUID(), ?, ?, ?)`
-        console.log(this);
-        return db.execute(credentials, [this.userId, this.imgId, this.comment]);
+			VALUES(?, ?, ?, ?)`
+            // console.log(this);
+        return db.execute(credentials, [this.id, this.userId, this.imgId, this.comment]);
     }
 
     static fetchCmtsByImages(imageId) {
-        return db.execute(`SELECT * FROM comments
-		WHERE imgId=? ORDER BY create_date DESC`, [imageId]);
+        return db.execute(`
+			SELECT c.id, user_id, concat(firstName, ' ', lastName) AS name, message
+			FROM comments c
+			JOIN users u
+    			ON c.user_id = u.id
+			WHERE c.img_id=? ORDER BY create_date DESC`, [imageId]);
     }
 
     static fetchCmt(cmtId) {
         return db.execute(`SELECT * FROM comments
 		WHERE id=?`, [cmtId]);
+    }
+
+    static fetchCmtAndUser(cmtId) {
+        const sql = `SELECT firstName, lastName FROM comments c
+		JOIN users u
+		ON u.id = c.user_id
+		WHERE c.id=?`
+        return db.execute(sql, [cmtId]);
     }
 
     static totalComments(imgId) {

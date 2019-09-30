@@ -6,6 +6,9 @@
     <body>
         <%-include('includes/navigation') %>
             <main class="bsod container">
+			<%if(errorMessage.length){%>
+						<div class="user-message user-message--error" style="visibility: hidden;"><%=errorMessage%></div>
+					<%}%>
                 <h1 class="neg title"><span class="bg">Error - 404</span></h1>
                 <p>An error has occured, to continue:</p>
                 <!-- <p>* Create or Put your index.html page in ~/http/MyWebSite/d03</p> -->

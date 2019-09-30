@@ -9,7 +9,7 @@ main {
 #main-box {
     display: grid;
     grid-template-columns: 3fr 1fr;
-    grid-column-gap: .6rem;
+    grid-column-gap: 0.6rem;
     max-height: 60vh;
 }
 
@@ -20,14 +20,14 @@ main {
 
 .imgs {
     display: grid;
-    grid-gap: .3rem;
+    grid-gap: 0.3rem;
     grid-template-columns: repeat(2, auto);
-    grid-template-rows: repeat(36, auto);
-    margin: 15px auto 0;
+    margin: 0 auto;
+    align-content: baseline;
 }
 
 .imgs img {
-    border: .35rem solid #333;
+    border: 0.35rem solid #333;
     max-width: 379px !important;
 }
 
@@ -73,7 +73,7 @@ main {
     font-family: "Lato", sans-serif;
     font-weight: 300;
     font-size: 1.2rem;
-    padding: .3rem;
+    padding: 0.3rem;
     border: none;
     border-bottom: 2px solid #f2f2f2;
 }
@@ -91,7 +91,7 @@ main {
     padding: 5px 10px;
     font-size: 1rem;
     color: #555;
-    background-color: #FFF;
+    background-color: #fff;
     border-bottom: 2px solid #f2f2f2;
 }
 
@@ -100,6 +100,11 @@ main {
     height: auto;
     padding: 0;
     border-top: 1px solid #e6e6e6;
+}
+
+.comment_block .new_comment .comment_body span {
+    color: #6495ed;
+    margin-right: 2px;
 }
 
 .user_avatar img {

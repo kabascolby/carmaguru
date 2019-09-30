@@ -2,6 +2,7 @@ const path = require('path');
 const mainPath = require('../utility/path');
 const ImageClass = require('../models/imagesDb');
 const CommentClass = require('../models/feedbacksDb');
+const utility = require('../utility/util');
 const bcrypt = require('bcryptjs');
 const ITEMS_PER_PAGE = 9;
 let totalItems;
@@ -56,20 +57,30 @@ exports.getIndex = (req, res, next) => {
 
 exports.getImageDetails = (req, res, next) => {
     const imgId = req.params.imageId;
-    ImageClass.findOneImgs(imgId, images => {
-        if (images) {
-            const img = images.find(img => img.id === imgId);
-            res.render('images', {
-                pageTitle: 'Image Details',
-                pagePath: '/images',
-                userId: req.session.userId,
-                imgs: images,
-                mainImg: img,
+    CommentClass.fetchCmtsByImages(imgId)
+        .then(([result]) => {
+            ImageClass.findOneImgs(imgId, images => {
+                if (images) {
+                    const img = images.find(img => img.id === imgId);
+                    res.render('images', {
+                        pageTitle: 'Image Details',
+                        pagePath: '/images',
+                        userId: req.session.userId,
+                        imgs: images,
+                        mainImg: img,
+                        cmts: result
+                    });
+                } else {
+                    res.redirect('/404')
+                }
             });
-        } else {
-            res.redirect('/404')
-        }
-    });
+        })
+        .catch(e => {
+            req.flash('error', 'Ressources not found');
+            console.error(e);
+            return res.redirect('/404')
+        })
+
 };
 
 /* ------------------------------------------------- comments API----------------------------------------------- */
@@ -78,19 +89,26 @@ exports.postComments = (req, res, next) => {
         const userId = req.body.userId;
         const imgId = req.body.imgId;
         const comment = req.body.comment;
+        const id = utility.create_UUID();
 
-        const cmtDb = new CommentClass(userId, imgId, comment)
+        const cmtDb = new CommentClass(id, userId, imgId, comment)
         cmtDb.save()
             .then(([result]) => {
                 if (result.warningStatus) {
                     console.error(new Error('Insertion in the DB FAIL', e));
                     return res.status(500).json('Internal Server Error');
                 }
-                return CommentClass.fetchCmtsByImages(imgId);
+                return CommentClass.fetchCmtAndUser(id);
             })
-            .then(([result]) => {
-                console.log(result)
-                res.status(200).json('ok');
+            .then(([
+                [result]
+            ]) => {
+                if (result)
+                    res.status(200).json({
+                        id,
+                        firstName: result.firstName,
+                        lastName: result.lastName
+                    });
             })
             .catch(e => {
                 res.status(500).json('Internal Server Error');

@@ -23,10 +23,15 @@
 								<div class="input_comment">
 									<input type="text"  placeholder="Join the conversation" name="comment-data">
 									<button  class="btn" id="add-comment" <%=isAuth ? "" : "disabled"%> data-id=<%=userId%> >Add Comment</button>
+									
 								</div>
-
 								<div class="new_comment">
 									<ul class="user_comment" id="list-comments">
+									<%for(let i of cmts){%>
+										<div class="comment_body">
+											<p id=<%=i.id%>><span class="user"><%=i.name%>:</span><%=i.message%></p>
+										</div>
+									<%}%>
 									</ul>
 								</div>
 
