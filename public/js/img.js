@@ -30,6 +30,8 @@ function imgClick(e) {
     prev_image.style.opacity = 1;
     //change click image to current image;
     current.src = e.target.src;
+    current.dataset.id = e.target.id;
+    current.alt = e.target.alt;
 
     //add fade in class
     current.classList.add('fade-in');

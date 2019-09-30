@@ -5,26 +5,35 @@
         <%-include('includes/navigation') %>
 			<div class="content">
 				<main>
-					<div class="main-img">
-						<img src=<%= `data:image/png;base64,${mainImg.path} `%> alt="" id="current" data-id=<%=mainImg.id%>>
+					<div id="main-box">
+						<div class="main-img">
+							<img src=<%= `data:image/png;base64,${mainImg.path} `%> alt="" id="current" data-id=<%=mainImg.id%>>
+						</div>
+						<div class="imgs">
+							<%for(let i of imgs){%>
+								<img src=<%= `data:image/png;base64,${i.path} `%> class="thumbnail" id=<%=i.id%> alt=<%=i.fname%>>
+						<%}%>		
+						</div>
 					</div>
-					<div class="comment_block">
-						<div class="create_new_comment">
-							<div class="user_avatar">
+						<div class="comment_block">
+							<div class="create_new_comment">
+								<!--<div class="user_avatar">
+									<img src="https://cdn3.iconfinder.com/data/icons/essentials-vol-1-1/512/User_Speech-2-512.png" class="avatar">
+								</div> -->
+								<div class="input_comment">
+									<input type="text"  placeholder="Join the conversation" name="comment-data">
+									<button  class="btn" id="add-comment" <%=isAuth ? "" : "disabled"%> data-id=<%=userId%> >Add Comment</button>
+								</div>
+
+								<div class="new_comment">
+									<ul class="user_comment" id="list-comments">
+									</ul>
+								</div>
 
 							</div>
-							<div class="input_comment">
-								<input type="text"  placeholder="Join the conversation" name="" value="">
-							</div>
 						</div>
-						
-					</div>
-					<div class="imgs">
-					 <%for(let i of imgs){%>
-							<img src=<%= `data:image/png;base64,${i.path} `%> class="thumbnail" id=<%=i.id%> alt=<%=i.fname%>>
-					<%}%>			
-					</div>
     			</main>
 			</div>
     <script src="/js/img.js"></script>
+    <script  type="module" src="/js/feedback.js"></script>
     <%-include('includes/end')%>

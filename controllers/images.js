@@ -1,6 +1,8 @@
 const path = require('path');
 const mainPath = require('../utility/path');
 const ImageClass = require('../models/imagesDb');
+const CommentClass = require('../models/feedbacksDb');
+const bcrypt = require('bcryptjs');
 const ITEMS_PER_PAGE = 9;
 let totalItems;
 
@@ -60,6 +62,7 @@ exports.getImageDetails = (req, res, next) => {
             res.render('images', {
                 pageTitle: 'Image Details',
                 pagePath: '/images',
+                userId: req.session.userId,
                 imgs: images,
                 mainImg: img,
             });
@@ -68,3 +71,30 @@ exports.getImageDetails = (req, res, next) => {
         }
     });
 };
+
+/* ------------------------------------------------- comments API----------------------------------------------- */
+
+exports.postComments = (req, res, next) => {
+        const userId = req.body.userId;
+        const imgId = req.body.imgId;
+        const comment = req.body.comment;
+
+        const cmtDb = new CommentClass(userId, imgId, comment)
+        cmtDb.save()
+            .then(([result]) => {
+                if (result.warningStatus) {
+                    console.error(new Error('Insertion in the DB FAIL', e));
+                    return res.status(500).json('Internal Server Error');
+                }
+                return CommentClass.fetchCmtsByImages(imgId);
+            })
+            .then(([result]) => {
+                console.log(result)
+                res.status(200).json('ok');
+            })
+            .catch(e => {
+                res.status(500).json('Internal Server Error');
+                console.log(e);
+            })
+    }
+    /* ______________________________________________________________________________________________________________________ */

@@ -38,6 +38,20 @@ function createImageTable() {
     ).catch(e => console.log(e));
 }
 
+function createCommentTable() {
+    const sql = `CREATE TABLE IF NOT EXISTS comments(
+		id varchar(36) NOT NULL PRIMARY KEY,
+		user_id varchar(36) NOT NULL,
+		img_id varchar(36) NOT NULL,
+		message varchar(255) NOT NULL,
+		modif_date TIMESTAMP(2) DEFAULT CURRENT_TIMESTAMP(2) ON UPDATE CURRENT_TIMESTAMP(2),
+		create_date TIMESTAMP(2) DEFAULT CURRENT_TIMESTAMP(2)
+	)ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;`
+    db.execute(sql).then(data => data[0].warningStatus === 0 ?
+        console.log('comments table Created', data[0]) : server.imgStatus = 0
+    ).catch(e => console.log(e));
+}
+
 
 function createTokentable() {
     const sql = `CREATE TABLE IF NOT EXISTS tokens (
@@ -63,6 +77,9 @@ if (server.imgStatus) {
 
 if (server.userStatus) {
     createTokentable();
+}
+if (server.userStatus) {
+    createCommentTable();
 }
 
 // http://www.mysqltutorial.org/mysql-uuid/
