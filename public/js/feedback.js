@@ -1,5 +1,7 @@
 const comments = document.getElementById('add-comment');
 const mainImg = document.getElementById('current');
+let previousMainId = mainImg.dataset.id;
+const commentList = document.getElementById('list-comments');
 
 import {
     api
@@ -8,30 +10,24 @@ import {
 function addComments(btn) {
     const comment = btn.parentNode.querySelector('[name=comment-data]').value;
     const userId = btn.dataset.id;
-    const imgId = mainImg.dataset.id;
+    const mainImgId = mainImg.dataset.id;
 
-    var data = new FormData();
-    data.append("json", JSON.stringify({
-        userId: userId,
-        imgId: imgId,
-        comment: comment
-    }));
-
-    let options = {
-        method: 'POST',
-        headers: {
-            'Accept': 'application/json, text/plain, */*',
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*'
-        },
-        body: JSON.stringify({
-            userId: userId,
-            imgId: imgId,
-            comment: comment
-        }),
-    }
 
     if (comment && comment.length > 1 && comment.length < 250) {
+        let options = {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json, text/plain, */*',
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*'
+            },
+            body: JSON.stringify({
+                userId: userId,
+                imgId: mainImgId,
+                comment: comment
+            }),
+        }
+
         api('/images/comments', options, (err, result) => {
             if (err) {
                 console.log(err)
@@ -55,13 +51,47 @@ function addComments(btn) {
     }
 }
 
-function refrechComments(e) {
-    console.log('here');
 
+document.getElementById('main-box').addEventListener('click', (e) => {
+
+
+
+    if (e.target.className == 'thumbnail' && previousMainId !== e.target.id) {
+        previousMainId = e.target.id;
+        refrechComments(e.target.id);
+    }
+
+}, false)
+
+
+function refrechComments(imgId) {
+    let options = {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json, text/plain, */*',
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+        },
+    }
+
+    api('/images/comments?fetch=' + imgId, options, (err, result) => {
+        if (err) {
+            alert(err);
+        }
+
+        if (!result.length) {
+            commentList.innerHTML = '';
+            renderComment('no-comment', '', 'Be the first to write something');
+        } else {
+            commentList.innerHTML = '';
+            for (let i of result) {
+                renderComment(i.id, i.name, i.message);
+            }
+        }
+    })
 }
 
 function renderComment(id, name, comment) {
-    const commentList = document.getElementById('list-comments');
     commentList.insertAdjacentHTML('afterbegin',
         `<div class="comment_body">
 			<p id=${id}><span class="user">${name}:</span>${comment}</p>
@@ -70,4 +100,3 @@ function renderComment(id, name, comment) {
 }
 
 comments !== undefined && comments.addEventListener('click', (e) => addComments(e.target));
-mainImg.value.addEventListener('change', e => refrechComments(e))

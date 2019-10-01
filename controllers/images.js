@@ -86,33 +86,52 @@ exports.getImageDetails = (req, res, next) => {
 /* ------------------------------------------------- comments API----------------------------------------------- */
 
 exports.postComments = (req, res, next) => {
-        const userId = req.body.userId;
-        const imgId = req.body.imgId;
-        const comment = req.body.comment;
-        const id = utility.create_UUID();
+    const userId = req.body.userId;
+    const imgId = req.body.imgId;
+    const comment = req.body.comment;
+    const id = utility.create_UUID();
 
-        const cmtDb = new CommentClass(id, userId, imgId, comment)
-        cmtDb.save()
-            .then(([result]) => {
-                if (result.warningStatus) {
-                    console.error(new Error('Insertion in the DB FAIL', e));
-                    return res.status(500).json('Internal Server Error');
-                }
-                return CommentClass.fetchCmtAndUser(id);
-            })
-            .then(([
-                [result]
-            ]) => {
-                if (result)
-                    res.status(200).json({
-                        id,
-                        firstName: result.firstName,
-                        lastName: result.lastName
-                    });
-            })
-            .catch(e => {
-                res.status(500).json('Internal Server Error');
-                console.log(e);
-            })
-    }
-    /* ______________________________________________________________________________________________________________________ */
+    const cmtDb = new CommentClass(id, userId, imgId, comment)
+    cmtDb.save()
+        .then(([result]) => {
+            if (result.warningStatus) {
+                console.error(new Error('Insertion in the DB FAIL', e));
+                return res.status(500).json('Internal Server Error');
+            }
+            return CommentClass.fetchCmtAndUser(id);
+        })
+        .then(([
+            [result]
+        ]) => {
+            if (result)
+                res.status(200).json({
+                    id,
+                    firstName: result.firstName,
+                    lastName: result.lastName
+                });
+        })
+        .catch(e => {
+            res.status(500).json('Internal Server Error');
+            console.log(e);
+        })
+}
+
+exports.getImageComments = (req, res, next) => {
+    const imgId = req.query.fetch;
+    CommentClass.fetchCmtsByImages(imgId)
+        .then(([result]) => {
+            console.log(result);
+            if (!result) {
+                console.error(new Error('Get image data'));
+                return res.status(500).json('Invalide Image');
+            }
+            res.status(200).json(result);
+
+        })
+        .catch(e => {
+            console.error(e);
+
+        })
+}
+
+/* ______________________________________________________________________________________________________________________ */
