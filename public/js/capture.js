@@ -7,6 +7,11 @@ import {
     currentImg
 } from './utils.js';
 
+let filter = 'none',
+    width = 500,
+    height = 0,
+    streaming = false;
+
 const captureButton = document.getElementById('capture');
 const fileInput = document.getElementById('file-input');
 
@@ -16,17 +21,22 @@ const canvas = document.getElementById('canvas');
 const saveImg = document.getElementById('save-img');
 const updateImg = document.getElementById('update-img');
 const thumb = document.getElementById('img-grid');
+const photoFilter = document.getElementById('photo-filter');
+const layer = document.getElementById('imgs-layer');
+let image = undefined;
 
 function shoot() {
-    if (state.value == 1) {
+    if (state.value == 1 && image) {
         resetElements('none', 'none', 'inline', false);
         const context = canvas.getContext('2d');
-        context.drawImage(player, 0, 0, canvas.width, canvas.height);
+        context.drawImage(player, 0, 0, width, height);
+        console.log(image.width, image.height);
+        context.drawImage(image, 0, 0, image.width, image.height);
         player.srcObject.getVideoTracks().forEach(track => track.stop());
 
         // Saving the current image info
-        new ImgToSend('', canvas.toDataURL(), 1);
-        Object.assign(currentImg, new ImgToSend('', canvas.toDataURL(), 1));
+        new ImgToSend('', canvas.toDataURL('image/png'), 1);
+        Object.assign(currentImg, new ImgToSend('', canvas.toDataURL('image/png'), 1));
         state.value = 0;
     } else {
         streamVideo();
@@ -68,14 +78,14 @@ function converTobinary(img, cb) {
 function streamVideo() {
     resetElements('none', 'inline', 'none', true);
 
-    const constraints = {
-        video: true,
-    };
-
-    navigator.mediaDevices.getUserMedia(constraints)
+    navigator.mediaDevices.getUserMedia({ video: true, audio: false })
         .then((stream) => {
+            /* Link to the video src */
             player.srcObject = stream;
-        });
+            /* Play the video */
+            player.play();
+        })
+        .catch(e => console.log('Error:' + e));
     state.value = 1;
 }
 
@@ -130,14 +140,53 @@ function updateImage() { // here I have to insert the new filter metadata
     });
 }
 
-window.onload = function() {
-    if (preview.getAttribute('src') !== '') {
-        resetElements('inline', 'none', 'none', false);
-    } else {
-        streamVideo();
+//Events
+
+player.addEventListener('canplay', function(e) {
+    if (!streaming) {
+        var videoRatio = player.videoWidth / player.videoHeight;
+        // The width and height of the video element
+        width = player.offsetWidth;
+        height = player.offsetHeight;
+        // The ratio of the element's width to its height
+        var elementRatio = width / height;
+        // If the video element is short and wide
+        if (elementRatio > videoRatio) width = height * videoRatio;
+        // It must be tall and thin, or exactly equal to the original ratio
+        else height = width / videoRatio;
+
+        canvas.setAttribute('width', width);
+        canvas.setAttribute('height', height);
+        canvas.width = width;
+        canvas.height = height;
+
+        streaming = true;
     }
-}
+}, false)
+
+
+
+/* filter event */
+photoFilter.addEventListener('change', function(e) {
+    /* Set filter to chosen option */
+    if (e.target.className === 'fitler') {
+        filter = e.target.value;
+        player.style.filter = filter;
+        e.preventDefault();
+    }
+})
+
+streamVideo();
 captureButton.addEventListener('click', shoot);
+
+
+///-------------------------test
+
+layer.addEventListener('click', e => {
+    image = e.target;
+
+});
+
 fileInput.addEventListener('change', (e) => placeImage(e));
 saveImg ? saveImg.addEventListener('click', displayImage) : updateImg.addEventListener('click', updateImage)
 

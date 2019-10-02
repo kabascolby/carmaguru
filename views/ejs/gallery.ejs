@@ -1,45 +1,68 @@
 <%- include('includes/start') %>
-<link rel="stylesheet" type="text/css" href="/css/gallery.css">
+    <link rel="stylesheet" type="text/css" href="/css/gallery.css">
     </head>
+
     <body>
-    <%-include('includes/navigation') %>
-		<div class="content">
-            <main>
-				<section class="main-grid">
-					<div class="capture">
-						<canvas id="canvas" width=1080 height=720></canvas>
-						<%if (edit){%>
-							<img src=<%=`data:image/png;base64,${edit.path} id=${edit.id} class="thumbnail" alt={edit.fname}`%>>
-						<%} else {%>
-							<img src="" alt="Image preview...">
-						<%}%>
-						<video id="player" controls autoplay></video>
-					</div>
-					<div>
-						<p>filters</p>
-					</div>
-					<%if(isAuth) {%>
-						<div  class="box__actions">
-							<button  class="btn" id="capture">Capture</button>
-							<input class="btn" type="file" id="file-input" accept="image/*;capture=user">
-							<%if (edit){%>
-								<button  class="btn" id="update-img">Update</button>
-							<%} else {%>
-								<button  class="btn" id="save-img" disabled>Save</button>
-							<%}%>
-						</div>
-					<%}%>
-				</section>
-				<aside class="thumbnail-grid" id="img-grid">
-				 <%for(let i of imgs){%>
-				 	<div>
-						<img src="https://image.flaticon.com/icons/svg/149/149147.svg" title="delete" class="del_img">
-						<img src=<%= `data:image/png;base64,${i.path} `%> class="thumbnail" id=<%=i.id%> alt=<%=i.fname%>>
-					</div>
-				<%}%>			
-				</aside>
-            </main>
-		</div>
-		<script src="/js/editing.js" type="module"></script>
-		<script src="/js/capture.js" type="module" ></script>
-<%-include('includes/end')%>
+        <%-include('includes/navigation') %>
+            <div class="content">
+                <main>
+                    <section class="main-grid">
+                        <div class="capture">
+                            <canvas id="canvas"></canvas>
+                            <%if (edit){%>
+                                <img src=<%=`data:image/png;base64,${edit.path} id=${edit.id} class="thumbnail" alt={edit.fname}`%>>
+                                <%} else {%>
+                                    <img src="" alt="Image preview...">
+                                    <%}%>
+                                        <video id="player" controls autoplay>Stream not available...</video>
+                        </div>
+                        <div>
+                            <p>filters</p>
+                            <select id="photo-filter" class="select">
+								<option value="none">Normal</option>
+								<option value="grayscale(100%)">Grayscale</option>
+								<option value="sepia(100%)">Sepia</option>
+								<option value="invert(100%)">Invert</option>
+								<option value="hue-rotate(90deg)">Hue</option>
+								<option value="blur(10px)">Blur</option>
+								<option value="contrast(200%)">Contrast</option>
+							</select>
+                            <div id="imgs-layer" class="layer">
+                                <div class="filter__div">
+                                    <img class="filter" src="/gallery/Download-Cat-PNG-Transparent-Image.png" width="150" height="113.5">
+                                </div>
+                                <div class="filter__div">
+                                    <img class="filter" src="/gallery/balls-layer1.png" width="1024" height="600">
+                                </div>
+                                <div class="filter__div">
+                                    <img class="filter" src="/gallery/border1.png" width="220" height="220">
+                                </div>
+                            </div>
+                        </div>
+                        <%if(isAuth) {%>
+                            <div class="box__actions">
+                                <button class="btn" id="capture">Capture</button>
+                                <input class="btn" type="file" id="file-input" accept="image/*;capture=user">
+                                <%if (edit){%>
+                                    <button class="btn" id="update-img">Update</button>
+                                    <%} else {%>
+                                        <button class="btn" id="save-img" disabled>Save</button>
+                                        <%}%>
+                            </div>
+                            <%}%>
+                    </section>
+                    <aside class="thumbnail-grid" id="img-grid">
+                        <%for(let i of imgs){%>
+                            <div>
+                                <img src="https://image.flaticon.com/icons/svg/149/149147.svg" title="delete" class="del_img">
+                                <img src=<%=` data:image/png;base64,${i.path} `%> class="thumbnail" id=
+                                <%=i.id%> alt=
+                                    <%=i.fname%>>
+                            </div>
+                            <%}%>
+                    </aside>
+                </main>
+            </div>
+            <script src="/js/editing.js" type="module"></script>
+            <script src="/js/capture.js" type="module"></script>
+            <%-include('includes/end')%>
