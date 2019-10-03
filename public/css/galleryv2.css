@@ -1,9 +1,16 @@
-body {
-    background: #333;
+#canvas {
+    /* display: none; */
 }
 
 .capture {
     height: 45vh;
+}
+
+video {
+    height: 100%;
+    width: 100%;
+    margin: 0 auto;
+    box-sizing: border-box;
 }
 
 .main-grid>div {
@@ -27,39 +34,13 @@ body {
     align-self: center;
 }
 
-.thumbnail-grid {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: stretch;
-    background: #fff;
-}
-
-.thumbnail-grid>div {
-    position: relative;
-    min-width: 7rem;
-    width: 11rem;
-    margin: 5px 5px 0px 0;
-    max-width: 20rem;
-    background-color: rgba(255, 255, 255, 0.88);
-}
-
-.thumbnail-grid>div img {
-    display: inline-block;
-    width: 100%;
-    height: 100%;
-}
-
-
-/* .nested {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-gap: 0.5rem;
-} */
-
 .box__actions {
+    margin-top: 1rem;
+    width: 70%;
     display: grid;
-    grid-template-columns: 1fr 1.7fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr;
     padding: 0.7rem;
+    background: #ffffffd9;
     text-align: center;
     grid-gap: 1rem;
 }
@@ -75,31 +56,16 @@ body {
     font-size: 0.8rem;
 }
 
-.btn:hover {
-    opacity: 1;
+.btn-dark {
+    /* background: #333; */
+    color: #fff;
+    border: #666 1px solid;
 }
 
-.capture>img {
-    display: none;
-    height: 100%;
-    width: auto;
-    max-width: 100%;
-    margin: 0 auto;
-    grid-auto-columns: 1fr;
-}
-
-video {
-    height: 100%;
-    width: 100%;
-    margin: 0 auto;
-    box-sizing: border-box;
-}
-
-#canvas {
-    display: none;
-    height: 100%;
-    width: 100%;
-    margin: 0 auto !important;
+.btn-light {
+    /* background: #f4f4f4; */
+    color: #333;
+    border: #ccc 1px solid;
 }
 
 .select {
@@ -111,6 +77,27 @@ video {
     border: #666 1px solid;
     border-radius: 0px;
     margin-bottom: 10px;
+}
+
+.thumbnail-grid {
+    display: flex;
+    flex-wrap: wrap;
+    /* justify-content: left; */
+    align-items: stretch;
+}
+
+.thumbnail-grid>div {
+    position: relative;
+    min-width: 7rem;
+    width: 11rem;
+    margin: 5px 5px 0px 0;
+    max-width: 20rem;
+    background-color: rgba(255, 255, 255, 0.88);
+}
+
+.thumbnail-grid div img {
+    width: 100%;
+    height: 100%;
 }
 
 .del_img {
@@ -133,20 +120,6 @@ video {
     background-color: #00695dab !important;
 }
 
-.filter__div {
-    width: 100px;
-    height: 100px;
-    border: 1px solid #333;
-}
-
-.filter {
-    width: 100%;
-    height: 100%;
-}
-
-.layer {
-    display: grid;
-    grid-template-columns: minmax(100px, auto);
-    grid-auto-flow: column;
-    grid-gap: 1.3rem;
+.btn:hover {
+    opacity: 1;
 }
