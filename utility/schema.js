@@ -1,9 +1,16 @@
+
+return ;
 const db = require('./database');
 const server = {
     userStatus: 1,
     imgStatus: 1
 
 };
+
+db.execute('CREATE DATABASE IF NOT EXISTS camagru')
+.then(data => data[0].warningStatus === 0 ?
+	console.log('Database camagru Created') : server.userStatus = 0
+).catch(e => console.log(e));
 
 // 0: normal user 1: manager  2: admin
 
