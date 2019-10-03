@@ -2,7 +2,6 @@
 const express = require('express');
 const bodyparser = require('body-parser');
 const session = require('express-session');
-
 /*
 Calling expression session Module to save user informations in a Db
 https://www.npmjs.com/package/express-mysql-session
@@ -18,20 +17,14 @@ const db = require('./utility/database');
 
 const app = express();
 
-const {PORT} = require('./config');
-/* 
-	creating a session constructor who take an Option as argument 
-	_____________________________________________________________________________
-*/
+const { PORT } = require('./utility/config');
+
+
+const options = require('./utility/options');
 //ToDO export this Later
 
-const options = {
-    host,
-    port,
-    user,
-    database,
-    password} = require('./config');
-    console.log(options);
+
+
 
 const sessionStore = new MySQLStore(options);
 /* _____________________________________________________________________________ */
@@ -98,9 +91,9 @@ app.use(imagesRoute);
 
 app.use(errorController.get404);
 
-const server = app.listen(port, (err) => {
+const server = app.listen(PORT, (err) => {
     if (err) console.log(err);
-    console.log('Server running on http://localhost:' + port);
+    console.log('Server running on http://localhost:' + PORT);
 })
 
 server.keepAliveTimeout = 0;

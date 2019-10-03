@@ -4,7 +4,8 @@ const sgMail = require('@sendgrid/mail');
 	Setup mailling services
 	_____________________________________________________________________________
 */
-sgMail.setApiKey(API_KEY);
+const { apikkey } = require('./config')
+sgMail.setApiKey(apikkey);
 /* _____________________________________________________________________________ */
 
 
