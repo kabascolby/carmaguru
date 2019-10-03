@@ -5,6 +5,11 @@ const server = {
 
 };
 
+db.execute('CREATE DATABASE IF NOT EXISTS camagru')
+.then(data => data[0].warningStatus === 0 ?
+	console.log('Database camagru Created') : server.userStatus = 0
+).catch(e => console.log(e));
+
 // 0: normal user 1: manager  2: admin
 
 function createUserstable() {
