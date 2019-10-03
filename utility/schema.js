@@ -1,3 +1,5 @@
+
+return ;
 const db = require('./database');
 const server = {
     userStatus: 1,

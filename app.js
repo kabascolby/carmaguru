@@ -18,7 +18,7 @@ const db = require('./utility/database');
 
 const app = express();
 
-const {port} = require('./config');
+const {PORT} = require('./config');
 /* 
 	creating a session constructor who take an Option as argument 
 	_____________________________________________________________________________
@@ -26,12 +26,12 @@ const {port} = require('./config');
 //ToDO export this Later
 
 const options = {
-    host: '192.168.99.100',
-    port: '3308',
-    user: 'root',
-    database: 'camagru',
-    password: 'lamine19'
-}
+    host,
+    port,
+    user,
+    database,
+    password} = require('./config');
+    console.log(options);
 
 const sessionStore = new MySQLStore(options);
 /* _____________________________________________________________________________ */

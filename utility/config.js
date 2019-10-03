@@ -1,7 +1,8 @@
 const dotenv = require('dotenv');
-dotenv.config();
-module.exports = {
-  mailkey: process.env.API_KEY,
-  masterKey: process.env.API_KEY,
-  port: process.env.PORT
-};
+const result = dotenv.config();
+if (result.error) {
+  throw result.error;
+}
+const { parsed: envs } = result;
+console.log(envs);
+module.exports = envs;
