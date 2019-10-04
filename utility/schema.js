@@ -5,9 +5,29 @@ const server = {
 };
 
 db.execute('CREATE DATABASE IF NOT EXISTS camagru')
-    .then(data => data[0].warningStatus === 0 ?
-        console.log('Database camagru Created') : server.userStatus = 0
-    ).catch(e => console.log(e));
+    .then(data => {
+        return createUserstable();
+    })
+    .then(([data]) => {
+        data.warningStatus === 0 ?
+            console.log('Users table Created') : 0
+        return createImageTable();
+    })
+    .then(([data]) => {
+        data.warningStatus === 0 ?
+            console.log('image table Created') : 0;
+        return createCommentTable();
+    })
+    .then(([data]) => {
+        data.warningStatus === 0 ?
+            console.log('comments table Created') : 0;
+        return createTokentable();
+    })
+    .then(([data]) => {
+        data.warningStatus === 0 ?
+            console.log('token table Created') : 0;
+    })
+    .catch(e => console.log(e));
 
 // 0: normal user 1: manager  2: admin
 
@@ -23,9 +43,7 @@ function createUserstable() {
 		reg_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 	  )ENGINE=InnoDB DEFAULT CHARSET=utf8`;
 
-    db.execute(sql).then(data => data[0].warningStatus === 0 ?
-        console.log('Users table Created') : server.userStatus = 0
-    ).catch(e => console.log(e));
+    return db.execute(sql);
 }
 
 function createImageTable() {
@@ -34,12 +52,13 @@ function createImageTable() {
 		user_id varchar(36) NOT NULL,
 		fname varchar(100) NOT NULL,
 		path varchar(255) NOT NULL,
+		n_likes INT DEFAULT 0,
+		n_comments INT DEFAULT 0,
+		meta varchar(255) DEFAULT '{}',
 		modif_date TIMESTAMP(2) DEFAULT CURRENT_TIMESTAMP(2) ON UPDATE CURRENT_TIMESTAMP(2),
 		create_date TIMESTAMP(2) DEFAULT CURRENT_TIMESTAMP(2)
 	)ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;`
-    db.execute(sql).then(data => data[0].warningStatus === 0 ?
-        console.log('image table Created', data[0]) : server.imgStatus = 0
-    ).catch(e => console.log(e));
+    return db.execute(sql);
 }
 
 function createCommentTable() {
@@ -51,9 +70,7 @@ function createCommentTable() {
 		modif_date TIMESTAMP(2) DEFAULT CURRENT_TIMESTAMP(2) ON UPDATE CURRENT_TIMESTAMP(2),
 		create_date TIMESTAMP(2) DEFAULT CURRENT_TIMESTAMP(2)
 	)ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;`
-    db.execute(sql).then(data => data[0].warningStatus === 0 ?
-        console.log('comments table Created', data[0]) : server.imgStatus = 0
-    ).catch(e => console.log(e));
+    return db.execute(sql);;
 }
 
 
@@ -65,25 +82,7 @@ function createTokentable() {
 		reg_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 	  )ENGINE=InnoDB DEFAULT CHARSET=utf8`;
 
-    db.execute(sql).then(data => data[0].warningStatus === 0 ?
-        console.log('token table Created') : server.userStatus = 0
-    ).catch(e => console.log(e));
-}
-
-
-if (server.userStatus) {
-    createUserstable();
-}
-
-if (server.imgStatus) {
-    createImageTable();
-}
-
-if (server.userStatus) {
-    createTokentable();
-}
-if (server.userStatus) {
-    createCommentTable();
+    return db.execute(sql);;
 }
 
 // http://www.mysqltutorial.org/mysql-uuid/
