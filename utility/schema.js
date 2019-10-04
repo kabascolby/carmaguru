@@ -4,10 +4,8 @@ const server = {
     imgStatus: 1
 };
 
-db.execute('CREATE DATABASE IF NOT EXISTS camagru')
-    .then(data => {
-        return createUserstable();
-    })
+
+createUserstable()
     .then(([data]) => {
         data.warningStatus === 0 ?
             console.log('Users table Created') : 0
