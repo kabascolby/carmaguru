@@ -6,10 +6,7 @@ A_init0/readcom
 .vscode/settings.json
 .vscode
 ._.DS_Store
-._*
-*.png
-*.jpeg
-*.jpg
+data/
 # dependencies
 node_modules/
 
