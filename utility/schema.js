@@ -80,9 +80,10 @@ function createTokentable() {
 		reg_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 	  )ENGINE=InnoDB DEFAULT CHARSET=utf8`;
 
-    return db.execute(sql);;
+    return db.execute(sql);
 }
 
 // http://www.mysqltutorial.org/mysql-uuid/
 // https://stackoverflow.com/questions/2187593/can-mysql-convert-a-stored-utc-time-to-local-timezone
 // https://stackoverflow.com/questions/409286/should-i-use-the-datetime-or-timestamp-data-type-in-mysql?rq=1
+// https://dev.mysql.com/doc/mysql-backup-excerpt/5.7/en/mysqldump-sql-format.html
