@@ -1,44 +1,55 @@
 <%- include('includes/start') %>
- <link rel="stylesheet" href="/css/images.css">
+    <link rel="stylesheet" href="/css/images.css">
+    <script src="https://kit.fontawesome.com/3bd3c61ba8.js"></script>
     </head>
+
     <body>
         <%-include('includes/navigation') %>
-			<div class="content">
-				<main>
-					<div id="main-box">
-						<div class="main-img">
-							<img src=<%= `data:image/png;base64,${mainImg.path} `%> alt="" id="current" data-id=<%=mainImg.id%>>
-						</div>
-						<div class="imgs">
-							<%for(let i of imgs){%>
-								<img src=<%= `data:image/png;base64,${i.path} `%> class="thumbnail" id=<%=i.id%> alt=<%=i.fname%>>
-						<%}%>		
-						</div>
-					</div>
-						<div class="comment_block">
-							<div class="create_new_comment">
-								<!--<div class="user_avatar">
+            <div class="content">
+                <main>
+                    <div id="main-box">
+                        <div class="main-img">
+                            <div class="like_container">
+                                <i id="like_btn" data-uid=<%=ow%> class="far fa-heart <%=(!isAuth || userId === mainImg.user_id) ? 'noclick' : ''%>"></i>
+
+                            </div>
+                            <img src=<%=` data:image/png;base64,${mainImg.path} `%> alt="" id="current" data-id=
+                            <%=mainImg.id%>>
+                        </div>
+                        <div class="imgs">
+                            <%for(let i of imgs){%>
+                                <img src=<%=` data:image/png;base64,${i.path} `%> class="thumbnail" id=
+                                <%=i.id%> alt=
+                                    <%=i.fname%>>
+                                        <%}%>
+                        </div>
+                    </div>
+                    <div class="comment_block">
+                        <div class="create_new_comment">
+                            <!--<div class="user_avatar">
 									<img src="https://cdn3.iconfinder.com/data/icons/essentials-vol-1-1/512/User_Speech-2-512.png" class="avatar">
 								</div> -->
-								<div class="input_comment">
-									<input type="text"  placeholder="Join the conversation" name="comment-data">
-									<button  class="btn" id="add-comment" <%=isAuth ? "" : "disabled"%> data-id=<%=userId%> >Add Comment</button>
-									
-								</div>
-								<div class="new_comment">
-									<ul class="user_comment" id="list-comments">
-									<%for(let i of cmts){%>
-										<div class="comment_body">
-											<p id=<%=i.id%>><span class="user"><%=i.name%>:</span><%=i.message%></p>
-										</div>
-									<%}%>
-									</ul>
-								</div>
+                            <div class="input_comment">
+                                <input type="text" placeholder="Join the conversation" name="comment-data">
+                                <button class="btn" id="add-comment" <%=isAuth ? "" : "disabled"%> data-id=<%=userId%> >Add Comment</button>
 
-							</div>
-						</div>
-    			</main>
-			</div>
-    <script src="/js/img.js"></script>
-    <script  type="module" src="/js/feedback.js"></script>
-    <%-include('includes/end')%>
+                            </div>
+                            <div class="new_comment">
+                                <ul class="user_comment" id="list-comments">
+                                    <%for(let i of cmts){%>
+                                        <div class="comment_body">
+                                            <p id=<%=i.id%>><span class="user"><%=i.name%>:</span>
+                                                <%=i.message%>
+                                            </p>
+                                        </div>
+                                        <%}%>
+                                </ul>
+                            </div>
+
+                        </div>
+                    </div>
+                </main>
+            </div>
+            <script src="/js/img.js"></script>
+            <script type="module" src="/js/feedback.js"></script>
+            <%-include('includes/end')%>

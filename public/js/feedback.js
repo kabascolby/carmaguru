@@ -9,7 +9,7 @@ import {
 
 function addComments(btn) {
     const comment = btn.parentNode.querySelector('[name=comment-data]').value;
-    const userId = btn.dataset.id;
+    const userId = btn.dataset.uid;
     const mainImgId = mainImg.dataset.id;
 
 
@@ -25,7 +25,7 @@ function addComments(btn) {
                 userId: userId,
                 imgId: mainImgId,
                 comment: comment
-            }),
+            })
         }
 
         api('/images/comments', options, (err, result) => {
@@ -100,3 +100,70 @@ function renderComment(id, name, comment) {
 }
 
 comments !== undefined && comments.addEventListener('click', (e) => addComments(e.target));
+
+
+/*----------------------- like btn implementation--------------------------------*/
+likeBtn.addEventListener('click', e => toggle(e));
+/* toggle like btn color on click */
+
+function toggle(e) {
+    e.preventDefault();
+    var btn = e.target;
+    // Getting loggued UserId from comments field
+    const userId = comments.dataset.id;
+    const mainImgId = mainImg.dataset.id;
+    const owner = btn.dataset.id;
+    // console.log(userId, mainImgId);
+    if (btn.classList.contains("far")) {
+        /* send action server Side */
+        // post to server
+        let options = {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json, text/plain, */*',
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*'
+            },
+            body: JSON.stringify({
+                owner,
+                userId,
+                imgId: mainImgId,
+            })
+        }
+
+        api('/images/likes', options, (err, result) => {
+            if (err) {
+                console.log(err)
+                alert('Oups Error Server try later');
+            } else if (result.btnId) {
+                btn.dataset.btn = result.btnId;
+                btn.classList.remove('far');
+                btn.classList.add('fas');
+            } else {
+                alert(result);
+            }
+        })
+    } else {
+
+        const id = btn.dataset.btn;
+        let options = {
+            method: 'delete',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                id,
+                imgId: mainImgId,
+            })
+        }
+
+        api('/images/likes', options, (err, result) => {
+            if (err) {
+                alert('Oups Error Server try later');
+            } else if (result == 'SUCCESS') {
+                btn.classList.remove('fas');
+                btn.classList.add('far');
+            } else {
+                alert(result);
+            }
+        });
+    }
+}

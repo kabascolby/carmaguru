@@ -104,7 +104,6 @@ module.exports = class Images {
             .catch(e => console.log(e));
     }
 
-
     static fetchPerPage(offset, itemsPerPage, cb) {
         /* Join two tables images and users to return all the images in a single array */
         const sql = `SELECT *

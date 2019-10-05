@@ -2,9 +2,10 @@ const path = require('path');
 const mainPath = require('../utility/path');
 const ImageClass = require('../models/imagesDb');
 const CommentClass = require('../models/feedbacksDb');
+const LikesClass = require('../models/likesDb');
 const utility = require('../utility/util');
 const bcrypt = require('bcryptjs');
-const ITEMS_PER_PAGE = 9;
+const ITEMS_PER_PAGE = 6;
 let totalItems;
 
 exports.getImages = (req, res, next) => {
@@ -62,12 +63,14 @@ exports.getImageDetails = (req, res, next) => {
             ImageClass.findOneImgs(imgId, images => {
                 if (images) {
                     const img = images.find(img => img.id === imgId);
+                    // console.log(img.user_id);
                     res.render('images', {
                         pageTitle: 'Image Details',
                         pagePath: '/images',
                         userId: req.session.userId,
                         imgs: images,
                         mainImg: img,
+                        ow: img.user_id,
                         cmts: result
                     });
                 } else {
@@ -90,12 +93,13 @@ exports.postComments = (req, res, next) => {
     const imgId = req.body.imgId;
     const comment = req.body.comment;
     const id = utility.create_UUID();
+    let userData;
 
     const cmtDb = new CommentClass(id, userId, imgId, comment)
     cmtDb.save()
         .then(([result]) => {
             if (result.warningStatus) {
-                console.error(new Error('Insertion in the DB FAIL', e));
+                console.error('Insertion in the DB FAIL', e);
                 return res.status(500).json('Internal Server Error');
             }
             return CommentClass.fetchCmtAndUser(id);
@@ -103,12 +107,20 @@ exports.postComments = (req, res, next) => {
         .then(([
             [result]
         ]) => {
-            if (result)
-                res.status(200).json({
-                    id,
-                    firstName: result.firstName,
-                    lastName: result.lastName
-                });
+            userData = {
+                id,
+                firstName: result.firstName,
+                lastName: result.lastName
+            };
+            return CommentClass.updateNcomment(imgId);
+        })
+        .then(([result]) => {
+            if (result.warningStatus) {
+                console.error('Insertion in the DB FAIL', e);
+                return res.status(500).json('Internal Server Error');
+            }
+
+            res.status(200).json(userData);
         })
         .catch(e => {
             res.status(500).json('Internal Server Error');
@@ -120,7 +132,6 @@ exports.getImageComments = (req, res, next) => {
     const imgId = req.query.fetch;
     CommentClass.fetchCmtsByImages(imgId)
         .then(([result]) => {
-            console.log(result);
             if (!result) {
                 console.error(new Error('Get image data'));
                 return res.status(500).json('Invalide Image');
@@ -135,3 +146,72 @@ exports.getImageComments = (req, res, next) => {
 }
 
 /* ______________________________________________________________________________________________________________________ */
+
+/* ------------------------------------------------------- Likes API ---------------------------------------------------- */
+
+exports.postLikes = (req, res, next) => {
+    const userId = req.body.userId;
+    const imgId = req.body.imgId;
+    const owner = req.body.owner;
+    const id = utility.create_UUID();
+    if (userId === owner) {
+        return res.json("Sorry it's from you");
+    }
+    const likeDb = new LikesClass(id, userId, imgId);
+    likeDb.save()
+        .then(([result]) => {
+            if (result.warningStatus) {
+                console.error('Error Durring insertion\n', e);
+                return res.status(200).json('Server Error try Later');
+            }
+            return LikesClass.addTotalLikes(imgId);
+        })
+        .then(([result]) => {
+            if (result.warningStatus) {
+                console.error('Error Durring insertion\n', e);
+                return res.status(200).json('Server Error try Later');
+            }
+            res.json({ btnId: id });
+        })
+        .catch(e => console.error('Error insertion in Like DB\n', e));
+
+    //check if userId == currentImg user;
+
+}
+
+
+
+exports.deleteLikes = (req, res, next) => {
+        const imgId = req.body.imgId;
+        const id = req.body.id;
+        const userId = req.session.userId;
+
+        /* checking first the user Already likes */
+        LikesClass.fetchLike(id)
+            .then(([
+                [result]
+            ]) => {
+                if (!result) {
+                    console.error('invalide Id in LikeDB\n', e);
+                    return res.status(200).json("You're not authorize");
+                }
+                return LikesClass.deductTotalLikes(imgId);
+            })
+            .then(([result]) => {
+                if (result.warningStatus) {
+                    console.error('Error During substraction \n', e);
+                    return res.status(200).json('Server Error try Later');
+                }
+                return LikesClass.deleteLikes(id);
+            })
+            .then(([result]) => {
+                if (result.warningStatus) {
+                    console.error('Error During substraction \n', e);
+                    return res.status(200).json('Server Error try Later');
+                }
+                res.status(200).json('SUCCESS');
+            })
+            .catch(e => console.log('Error deleting like in DB', e));
+
+    }
+    /* ______________________________________________________________________________________________________________________ */

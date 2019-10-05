@@ -24,6 +24,11 @@ createUserstable()
     .then(([data]) => {
         data.warningStatus === 0 ?
             console.log('token table Created') : 0;
+        return createLikesTable()
+    })
+    .then(([data]) => {
+        data.warningStatus === 0 ?
+            console.log('likes table Created') : 0;
     })
     .catch(e => console.log(e));
 
@@ -68,9 +73,19 @@ function createCommentTable() {
 		modif_date TIMESTAMP(2) DEFAULT CURRENT_TIMESTAMP(2) ON UPDATE CURRENT_TIMESTAMP(2),
 		create_date TIMESTAMP(2) DEFAULT CURRENT_TIMESTAMP(2)
 	)ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;`
-    return db.execute(sql);;
+    return db.execute(sql);
 }
 
+
+function createLikesTable() {
+    const sql = `CREATE TABLE IF NOT EXISTS likes(
+		id varchar(36) NOT NULL PRIMARY KEY,
+		user_id varchar(36) NOT NULL,
+		img_id varchar(36) NOT NULL,
+		create_date TIMESTAMP(2) DEFAULT CURRENT_TIMESTAMP(2)
+	)ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;`
+    return db.execute(sql);
+}
 
 function createTokentable() {
     const sql = `CREATE TABLE IF NOT EXISTS tokens (
@@ -82,6 +97,7 @@ function createTokentable() {
 
     return db.execute(sql);
 }
+
 
 // http://www.mysqltutorial.org/mysql-uuid/
 // https://stackoverflow.com/questions/2187593/can-mysql-convert-a-stored-utc-time-to-local-timezone

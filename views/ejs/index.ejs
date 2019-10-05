@@ -1,36 +1,41 @@
 <%- include('includes/start') %>
- <link rel="stylesheet" href="/css/index.css">
+    <link rel="stylesheet" href="/css/index.css">
     </head>
+
     <body>
         <%-include('includes/navigation') %>
-			<div class="content">
-				<main> 
-					<div class="grid">
-						<%if(!imgs.length){%>
-							<h1  style="color:#FFF;"> No Images Yet...</h1>
-						<%}%>
-						<%for(let i of imgs){%>
-							<article class="box image-item">
-								<div class="box__image">
-									<img src=<%= `data:image/png;base64,${i.path} `%> class="thumbnail" id=<%=i.id%> alt=<%=i.fname%>>
-								</div>
-								<div class="box__content">
-									<h2 class="image_infos">10l</h2>
-									<h2 class="image_infos">09c</h2>
-								</div>
-								<div class="box__actions">
-										<% if(isAuth && userId === i.user_id) { %>
-											<form action='/gallery/edit' method='POST'> 
-												<input type="hidden" name="imgId" value="<%= i.id %>">
-													<button type="submit" class="btn">Edit</button> 
-											</form>
-										<%}%>
-									<a href="/images/<%= i.id %>" class="btn">Details</a>
-								</div>
-							</article>
-						<%}%>
-					</div>
-					<%-include('includes/pagination', {
+            <div class="content">
+                <main>
+                    <div class="grid">
+                        <%if(!imgs.length){%>
+                            <h1 style="color:#FFF;"> No Images Yet...</h1>
+                            <%}%>
+                                <%for(let i of imgs){%>
+                                    <article class="box image-item">
+                                        <div class="box__image">
+                                            <img src=<%=` data:image/png;base64,${i.path} `%> class="thumbnail" id=
+                                            <%=i.id%> alt=
+                                                <%=i.fname%>>
+                                        </div>
+                                        <div class="box__content">
+                                            <h2 class="image_infos">
+                                                <%=i.n_likes%>&emsp;<img src="/gallery/likes.png" class="icon"></h2>
+                                            <h2 class="image_infos">
+                                                <%=i.n_comments%>&emsp;<img src="/gallery/comments.png" class="icon"></h2>
+                                        </div>
+                                        <div class="box__actions">
+                                            <% if(isAuth && userId === i.user_id) { %>
+                                                <form action='/gallery/edit' method='POST'>
+                                                    <input type="hidden" name="imgId" value="<%= i.id %>">
+                                                    <button type="submit" class="btn">Edit</button>
+                                                </form>
+                                                <%}%>
+                                                    <a href="/images/<%= i.id %>" class="btn">Details</a>
+                                        </div>
+                                    </article>
+                                    <%}%>
+                    </div>
+                    <%-include('includes/pagination', {
 						currentPage,
 						previousPage,
 						hasPreviousPage,
@@ -39,6 +44,6 @@
 						lastPage
 					})%>
 
-				</main>
-			</div>
-    <%-include('includes/end')%>
+                </main>
+            </div>
+            <%-include('includes/end')%>

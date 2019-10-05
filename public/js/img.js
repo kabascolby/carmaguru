@@ -1,10 +1,11 @@
 const current = document.querySelector('#current');
 const imgs = document.querySelectorAll('.imgs img');
 const opacity = 0.6;
-// var prev_image = { target: { style: { opacity: 1 } } };
-var prev_image;
+let prev_image;
+let count = 0
 
-var count = 0
+/*like btn */
+const likeBtn = document.getElementById('like_btn');
 
 /* 
 	set firt image opacity;

@@ -24,6 +24,13 @@ module.exports = class Comments {
 			WHERE c.img_id=? ORDER BY create_date DESC`, [imageId]);
     }
 
+    static updateNcomment(imgId) {
+        const sql = `UPDATE images
+		SET n_comments = n_comments + 1
+		WHERE id=?`;
+        return db.execute(sql, [imgId]);
+    }
+
     static fetchCmt(cmtId) {
         return db.execute(`SELECT * FROM comments
 		WHERE id=?`, [cmtId]);
