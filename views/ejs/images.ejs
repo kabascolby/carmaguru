@@ -10,7 +10,8 @@
                     <div id="main-box">
                         <div class="main-img">
                             <div class="like_container">
-                                <i id="like_btn" data-uid=<%=ow%> class="far fa-heart <%=(!isAuth || userId === mainImg.user_id) ? 'noclick' : ''%>"></i>
+                                <i id="like_btn" data-uid=<%=ow%>
+									class="<%=likeId ? 'fas' : 'far'%> fa-heart <%=(!isAuth || userId === mainImg.user_id) ? 'noclick' : ''%>" data-btn=<%=likeId? likeId:''%>></i>
 
                             </div>
                             <img src=<%=` data:image/png;base64,${mainImg.path} `%> alt="" id="current" data-id=

@@ -32,6 +32,8 @@ body {
     flex-wrap: wrap;
     align-items: stretch;
     background: #fff;
+    margin: 10px 0;
+    /* max-width: 65vw; */
 }
 
 .thumbnail-grid>div {
@@ -149,4 +151,10 @@ video {
     grid-template-columns: minmax(100px, auto);
     grid-auto-flow: column;
     grid-gap: 1.3rem;
+}
+
+@media screen and (min-width: 768px) {
+    .thumbnail-grid {
+        max-width: 65vw;
+    }
 }

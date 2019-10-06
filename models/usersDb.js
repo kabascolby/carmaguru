@@ -65,6 +65,16 @@ module.exports = class User {
         return db.execute(`UPDATE users SET password=? WHERE id=?`, [newPassword, userId])
     }
 
+    static fetchByUserId(userId) {
+        return db.execute(`SELECT * FROM users WHERE id=?`, [userId]);
+    }
+
+    static updateCredentials(firstname, lastname, username, email, userId) {
+        const sql = `UPDATE users 
+			SET firstname=?, lastname=?, username=?, email=?
+			WHERE id=?`;
+        return db.execute(sql, [firstname, lastname, username, email, userId]);
+    }
     static fetchAll() {
         return db.execute(`SELECT * FROM users`);
     }

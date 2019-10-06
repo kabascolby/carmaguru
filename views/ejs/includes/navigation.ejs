@@ -1,18 +1,27 @@
 <header>
+    <input type="checkbox" id="nav-toggle" class="nav-toggle" />
     <h1 class="logo_title">BADASS</h1>
-    <input type="checkbox" id="nav-toggle" class="nav-toggle">
     <nav>
         <ul class="menu">
-            <li><a class="<%= pagePath === '/' ? 'active' : '' %>" href="/">Home</a></li>
-            <li><a class="<%= pagePath === '/gallery' ? 'active' : '' %>" href="/gallery">Gallery</a></li>
-			<% if(isAuth) { %>
-            	<li><a href="/api/logout ">logout</a></li>
-			<%} else {%>
-            	<li><a class="<%= pagePath === '/api/login' ? 'active' : '' %>" href=" /api/login ">Login</a></li>
-			<%}%>
-        </ul>
-    </nav>
-    <label for="nav-toggle " class="nav-toggle-label ">
-		<span></span>
-	</label>
+            <li>
+                <a class="<%= pagePath === '/' ? 'active' : '' %>" href="/">Home</a>
+            </li>
+            <li>
+                <a class="<%= pagePath === '/gallery' ? 'active' : '' %>" href="/gallery">Gallery</a
+        >
+      </li>
+      <% if(isAuth) { %>
+      <li><a href="/settings">Settings</a></li>
+            <li><a href="/api/logout ">logout</a></li>
+            <%} else {%>
+                <li>
+                    <a class="<%= pagePath === '/api/login' ? 'active' : '' %>" href=" /api/login ">Login</a
+        >
+      </li>
+      <%}%>
+    </ul>
+  </nav>
+  <label for="nav-toggle " class="nav-toggle-label ">
+    <span></span>
+  </label>
 </header>

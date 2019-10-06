@@ -34,7 +34,7 @@ module.exports = class Likes {
         return db.execute(sql, [id]);
     }
 
-    static likesByUser(imgId, userId) {
+    static fetchLikesByImages(imgId, userId) {
         let sql = `SELECT id FROM likes
 		WHERE img_id=? AND user_id=?`;
         return db.execute(sql, [imgId, userId]);

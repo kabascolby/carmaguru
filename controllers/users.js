@@ -110,6 +110,8 @@ exports.postUserRegistration = (req, res, next) => {
         })
         .catch(e => {
             console.error(e);
+            req.flash('error', 'Invalid data format');
+            return res.redirect('/api/signIn');
         });
 };
 
@@ -184,7 +186,7 @@ exports.postReset = (req, res, next) => {
             .catch((e) => {
                 console.error(new Error('Error retriving user data', e));
                 req.flash('error', 'Server Error please try later');
-                // res.redirect('/api/reset');
+                res.redirect('/api/reset');
             });
     })
 }
@@ -248,5 +250,87 @@ exports.postNewPassword = (req, res, next) => {
 
 /* ______________________________________________________________________________________________________________________ */
 
-//TODO FIX THIS DOESN NEED THIS PART
-// exports.userDb = UserDb;
+/* ------------------------------------------------- User Settings ----------------------------------------------- */
+
+exports.getUserSettings = (req, res, next) => {
+    const userId = req.session.userId;
+    UserDb.fetchByUserId(userId)
+        .then(([
+            [userData]
+        ]) => {
+            if (!userData) {
+                req.flash('error', 'Invalide informations');
+                return res.redirect('/settings');
+            }
+            res.render('settings', {
+                pageTitle: 'settings',
+                pagePath: '/settings',
+                user: userData
+                    // errorMessage: req.flash('error')
+            })
+        })
+        .catch(e => {
+            console.log('Error on setting controller\n', e);
+            req.flash('error', 'Server Error please try later');
+            res.redirect('/settings');
+        });
+};
+
+exports.postUserSettings = (req, res, next) => {
+    const userId = req.session.userId;
+    let pass;
+    UserDb.fetchByUserId(userId)
+        .then(([
+            [result]
+        ]) => {
+            if (!result) {
+                req.flash('error', 'Invalide informations retry');
+                return res.redirect('/settings');
+            }
+            const { first, last, username, email, password } = req.body;
+            if (!first || !first.length || !last || !last.length ||
+                !username || !username.length || !email || !email.length) {
+                req.flash('error', 'Empty field');
+                return res.redirect('/settings');
+            }
+            pass = password;
+
+            return UserDb.updateCredentials(first, last, username, email, userId);
+        })
+        .then(([result]) => {
+            if (result.warningStatus !== 0) {
+                req.flash('error', '😞Server error try later');
+                return res.redirect('/settings');
+            }
+
+            if (pass && pass.length) {
+                bcrypt.hash(pass, 12)
+                    .then(hashedPsw => {
+                        return UserDb.updatePassword(userId, hashedPsw);
+                    })
+                    .then(([result]) => {
+                        if (result.warningStatus !== 0) {
+                            req.flash('error', '😞Server error try later');
+                            return res.redirect('/settings');
+                        }
+                        res.redirect('/api/login');
+                    })
+                    .catch(e => {
+                        console.error('error insertion password\n', e);
+                        req.flash('error', '😞Server error try later');
+                        return res.redirect('/settings');
+                    });
+
+            } else {
+                res.redirect('/api/login');
+            }
+        })
+        .catch(e => {
+            console.log('Error on setting controller\n', e);
+            req.flash('error', 'Server Error please try later');
+            return res.redirect('/settings');
+        });
+}
+
+
+/* ______________________________________________________________________________________________________________________ */

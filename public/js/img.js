@@ -4,9 +4,6 @@ const opacity = 0.6;
 let prev_image;
 let count = 0
 
-/*like btn */
-const likeBtn = document.getElementById('like_btn');
-
 /* 
 	set firt image opacity;
 	imgs return a NodeList of all the image selector but It's not an array

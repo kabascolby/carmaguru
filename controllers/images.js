@@ -3,8 +3,9 @@ const mainPath = require('../utility/path');
 const ImageClass = require('../models/imagesDb');
 const CommentClass = require('../models/feedbacksDb');
 const LikesClass = require('../models/likesDb');
+const UserClass = require('../models/usersDb');
 const utility = require('../utility/util');
-const bcrypt = require('bcryptjs');
+const sgMail = require('../utility/mail');
 const ITEMS_PER_PAGE = 6;
 let totalItems;
 
@@ -58,12 +59,25 @@ exports.getIndex = (req, res, next) => {
 
 exports.getImageDetails = (req, res, next) => {
     const imgId = req.params.imageId;
+    const userId = req.session.userId;
+    let usersComments;
+
     CommentClass.fetchCmtsByImages(imgId)
         .then(([result]) => {
+            usersComments = result;
+            if (userId)
+                return LikesClass.fetchLikesByImages(imgId, userId);
+            return [
+                [undefined]
+            ];
+        })
+        .then(([
+            [likes]
+        ]) => {
+
             ImageClass.findOneImgs(imgId, images => {
                 if (images) {
                     const img = images.find(img => img.id === imgId);
-                    // console.log(img.user_id);
                     res.render('images', {
                         pageTitle: 'Image Details',
                         pagePath: '/images',
@@ -71,7 +85,8 @@ exports.getImageDetails = (req, res, next) => {
                         imgs: images,
                         mainImg: img,
                         ow: img.user_id,
-                        cmts: result
+                        cmts: usersComments,
+                        likeId: likes ? likes.id : undefined
                     });
                 } else {
                     res.redirect('/404')
@@ -81,7 +96,7 @@ exports.getImageDetails = (req, res, next) => {
         .catch(e => {
             req.flash('error', 'Ressources not found');
             console.error(e);
-            return res.redirect('/404')
+            res.redirect('/404')
         })
 
 };
@@ -130,13 +145,18 @@ exports.postComments = (req, res, next) => {
 
 exports.getImageComments = (req, res, next) => {
     const imgId = req.query.fetch;
-    CommentClass.fetchCmtsByImages(imgId)
-        .then(([result]) => {
+    Promise.all([CommentClass.fetchCmtsByImages(imgId), LikesClass.fetchLikesByImages(imgId, req.session.userId)])
+        .then(([
+            [result],
+            [
+                [result2]
+            ]
+        ]) => {
             if (!result) {
                 console.error(new Error('Get image data'));
                 return res.status(500).json('Invalide Image');
             }
-            res.status(200).json(result);
+            res.status(200).json([result, result2]);
 
         })
         .catch(e => {
@@ -152,9 +172,9 @@ exports.getImageComments = (req, res, next) => {
 exports.postLikes = (req, res, next) => {
     const userId = req.body.userId;
     const imgId = req.body.imgId;
-    const owner = req.body.owner;
+    const ownerId = req.body.owner;
     const id = utility.create_UUID();
-    if (userId === owner) {
+    if (userId === ownerId) {
         return res.json("Sorry it's from you");
     }
     const likeDb = new LikesClass(id, userId, imgId);
@@ -172,6 +192,31 @@ exports.postLikes = (req, res, next) => {
                 return res.status(200).json('Server Error try Later');
             }
             res.json({ btnId: id });
+            return Promise.all([UserClass.fetchByUserId(ownerId), UserClass.fetchByUserId(userId)]);
+        })
+        .then(([
+            [
+                [sender]
+            ],
+            [
+                [user]
+            ]
+        ]) => {
+            if (sender) {
+                const msg = {
+                    to: sender.email,
+                    from: 'info@camagru.com',
+                    subject: 'Like',
+                    text: 'and easy to do anywhere, even with Node.js',
+                    html: `<h2>Hi ${sender.firstname}  ${sender.lastname}</h2>
+            			<h3>${user.firstname}  ${user.lastname} give you a like</h3>
+            			<p>visit http://localhost:8080 for more details</p>`,
+                };
+                sgMail.send(msg, (err) => {
+                    if (err)
+                        console.error('error --------------->', err)
+                });
+            }
         })
         .catch(e => console.error('Error insertion in Like DB\n', e));
 
@@ -210,6 +255,8 @@ exports.deleteLikes = (req, res, next) => {
                     return res.status(200).json('Server Error try Later');
                 }
                 res.status(200).json('SUCCESS');
+                //sending a mail here will be a good idea
+
             })
             .catch(e => console.log('Error deleting like in DB', e));
 

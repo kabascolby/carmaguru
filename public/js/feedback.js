@@ -2,6 +2,8 @@ const comments = document.getElementById('add-comment');
 const mainImg = document.getElementById('current');
 let previousMainId = mainImg.dataset.id;
 const commentList = document.getElementById('list-comments');
+/*like btn */
+const likeBtn = document.getElementById('like_btn');
 
 import {
     api
@@ -83,9 +85,22 @@ function refrechComments(imgId) {
             commentList.innerHTML = '';
             renderComment('no-comment', '', 'Be the first to write something');
         } else {
-            commentList.innerHTML = '';
-            for (let i of result) {
-                renderComment(i.id, i.name, i.message);
+            let [comments, like] = result;
+            if (comments) {
+                commentList.innerHTML = '';
+                for (let i of comments) {
+                    renderComment(i.id, i.name, i.message);
+                }
+            }
+
+            if (like) {
+                likeBtn.dataset.btn = like.id;
+                likeBtn.classList.remove('far');
+                likeBtn.classList.add('fas');
+            } else {
+                delete likeBtn.dataset.btn;
+                likeBtn.classList.remove('fas');
+                likeBtn.classList.add('far');
             }
         }
     })
@@ -112,7 +127,7 @@ function toggle(e) {
     // Getting loggued UserId from comments field
     const userId = comments.dataset.id;
     const mainImgId = mainImg.dataset.id;
-    const owner = btn.dataset.id;
+    const owner = btn.dataset.uid;
     // console.log(userId, mainImgId);
     if (btn.classList.contains("far")) {
         /* send action server Side */
