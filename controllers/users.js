@@ -166,7 +166,9 @@ exports.postReset = (req, res, next) => {
                     res.redirect('/api/reset');
                 }
 
+                req.flash('info', 'Verify your account to validate');
                 res.redirect('/api/login');
+
                 const msg = {
                     to: email,
                     from: 'info@camagru.com',
@@ -278,7 +280,7 @@ exports.getUserSettings = (req, res, next) => {
 
 exports.postUserSettings = (req, res, next) => {
     const userId = req.session.userId;
-    let pass;
+    var prevUser;
     UserDb.fetchByUserId(userId)
         .then(([
             [result]
@@ -287,21 +289,37 @@ exports.postUserSettings = (req, res, next) => {
                 req.flash('error', 'Invalide informations retry');
                 return res.redirect('/settings');
             }
-            const { first, last, username, email, password } = req.body;
+
+            /* Checking for empty for empty field */
+
+            const { first, last, username, email } = req.body;
             if (!first || !first.length || !last || !last.length ||
                 !username || !username.length || !email || !email.length) {
                 req.flash('error', 'Empty field');
                 return res.redirect('/settings');
             }
-            pass = password;
 
+            prevUser = result;
+            return UserDb.duplicated(req.body.username);
+
+        })
+        .then(([data]) => {
+            if (data && data.length > 1 || data[0].id !== prevUser.id) {
+                req.flash('error', '😞Username already taken please try another one');
+                return res.redirect('/settings');
+            }
+
+            const { first, last, username, email } = req.body;
             return UserDb.updateCredentials(first, last, username, email, userId);
+
         })
         .then(([result]) => {
             if (result.warningStatus !== 0) {
                 req.flash('error', '😞Server error try later');
                 return res.redirect('/settings');
             }
+
+            let pass = req.body.password;
 
             if (pass && pass.length) {
                 bcrypt.hash(pass, 12)
@@ -326,9 +344,9 @@ exports.postUserSettings = (req, res, next) => {
             }
         })
         .catch(e => {
-            console.log('Error on setting controller\n', e);
+            console.error('Error on setting controller\n', e);
             req.flash('error', 'Server Error please try later');
-            return res.redirect('/settings');
+            res.redirect('/settings');
         });
 }
 

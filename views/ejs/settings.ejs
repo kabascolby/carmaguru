@@ -31,8 +31,7 @@
                                     <input type="text" placeholder="Enter Email" name="email" id="email" value="<%=user.email%>" required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$">
 
                                     <label for="psw"><b> New password</b></label>
-                                    <input type="password" placeholder="Password to change previous" name="password" id="psw" pattern="^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?!.*\s).*$" title="Must contain at least one number and one uppercase and lowercase letter, and at least 8 or more characters"
-                                        autocomplete="new-password">
+                                    <input type="password" placeholder="To change previous" name="password" id="psw" pattern="^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?!.*\s).*$" title="Must contain at least one number and one uppercase and lowercase letter, and at least 8 or more characters" autocomplete="new-password">
                                     <hr>
                                     <p>By changing these you cannot recover the previous informations.</p>
                                     <input type="submit" class="registerbtn" name="submit">

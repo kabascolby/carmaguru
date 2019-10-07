@@ -31,7 +31,7 @@
 									<img src="https://cdn3.iconfinder.com/data/icons/essentials-vol-1-1/512/User_Speech-2-512.png" class="avatar">
 								</div> -->
                             <div class="input_comment">
-                                <input type="text" placeholder="Join the conversation" name="comment-data">
+                                <input type="text" placeholder="Join the conversation" name="comment-data" pattern="[a-zA-Z0-9-]+">
                                 <button class="btn" id="add-comment" <%=isAuth ? "" : "disabled"%> data-id=<%=userId%> >Add Comment</button>
 
                             </div>

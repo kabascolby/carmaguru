@@ -104,15 +104,19 @@ exports.getImageDetails = (req, res, next) => {
 /* ------------------------------------------------- comments API----------------------------------------------- */
 
 exports.postComments = (req, res, next) => {
-    const userId = req.body.userId;
+    const userId = req.session.userId;
     const imgId = req.body.imgId;
     const comment = req.body.comment;
     const id = utility.create_UUID();
     let userData;
+    if (!userId || !imgId) {
+        return res.status(200).json("You're not authorize try to logIn");
+    }
 
     const cmtDb = new CommentClass(id, userId, imgId, comment)
     cmtDb.save()
         .then(([result]) => {
+            console.log('here')
             if (result.warningStatus) {
                 console.error('Insertion in the DB FAIL', e);
                 return res.status(500).json('Internal Server Error');
@@ -127,6 +131,7 @@ exports.postComments = (req, res, next) => {
                 firstName: result.firstName,
                 lastName: result.lastName
             };
+            // console.log(userData, req.session.userId);
             return CommentClass.updateNcomment(imgId);
         })
         .then(([result]) => {
@@ -134,8 +139,9 @@ exports.postComments = (req, res, next) => {
                 console.error('Insertion in the DB FAIL', e);
                 return res.status(500).json('Internal Server Error');
             }
-
             res.status(200).json(userData);
+
+
         })
         .catch(e => {
             res.status(500).json('Internal Server Error');
@@ -145,24 +151,29 @@ exports.postComments = (req, res, next) => {
 
 exports.getImageComments = (req, res, next) => {
     const imgId = req.query.fetch;
-    Promise.all([CommentClass.fetchCmtsByImages(imgId), LikesClass.fetchLikesByImages(imgId, req.session.userId)])
-        .then(([
-            [result],
-            [
-                [result2]
-            ]
-        ]) => {
-            if (!result) {
-                console.error(new Error('Get image data'));
-                return res.status(500).json('Invalide Image');
-            }
-            res.status(200).json([result, result2]);
+    if (!req.session.userId) {
+        req.flash('error', '😞You have to login to see others comments');
+        return res.status(200).json([null, null]);
+    } else {
+        Promise.all([CommentClass.fetchCmtsByImages(imgId), LikesClass.fetchLikesByImages(imgId, req.session.userId)])
+            .then(([
+                [result],
+                [
+                    [result2]
+                ]
+            ]) => {
+                if (!result) {
+                    console.error(new Error('Get image data'));
+                    return res.status(500).json('Invalide Image');
+                }
+                res.status(200).json([result, result2]);
 
-        })
-        .catch(e => {
-            console.error(e);
+            })
+            .catch(e => {
+                console.error(e);
 
-        })
+            })
+    }
 }
 
 /* ______________________________________________________________________________________________________________________ */

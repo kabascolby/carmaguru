@@ -7,17 +7,34 @@
             <div class="content">
                 <main>
                     <section class="main-grid">
-                        <div class="capture">
-                            <canvas id="canvas"></canvas>
-                            <%if (edit){%>
-                                <img src=<%=`data:image/png;base64,${edit.path} id=${edit.id} class="thumbnail" alt={edit.fname}`%>>
-                                <%} else {%>
-                                    <img src="" alt="Image preview...">
-                                    <%}%>
-                                        <video id="player" controls autoplay>Stream not available...</video>
+                        <div class="capture__box">
+                            <div class="capture">
+                                <canvas id="canvas" class="canvas"></canvas>
+                                <%if (edit){%>
+                                    <img src=<%=`data:image/png;base64,${edit.path} id=${edit.id} class="thumbnail" alt={edit.fname}`%>>
+                                    <%} else {%>
+                                        <img class="main_image" alt="Image preview...">
+                                        <%}%>
+                                            <video id="video" controls autoplay>Stream not available...</video>
+                            </div>
+
+                            <p class="layer_text">Layers</p>
+                            <div id="imgs-layer" class="layer">
+                                <div class="filter__div">
+                                    <img class="filter" src="/gallery/cat.png" width="150" height="113.5" data-name="cat">
+                                </div>
+                                <div class="filter__div">
+                                    <img class="filter" src="/gallery/balls.png" width="1024" height="600" data-name="balls">
+                                </div>
+                                <div class="filter__div">
+                                    <img class="filter" src="/gallery/border.png" width="220" height="220" data-name="border">
+                                </div>
+                                <div class="filter__div">
+                                    <img class="filter" src="/gallery/green.png" data-name="flower">
+                                </div>
+                            </div>
                         </div>
                         <div>
-                            <p>filters</p>
                             <select id="photo-filter" class="select">
 								<option value="none">Normal</option>
 								<option value="grayscale(100%)">Grayscale</option>
@@ -27,22 +44,13 @@
 								<option value="blur(10px)">Blur</option>
 								<option value="contrast(200%)">Contrast</option>
 							</select>
-                            <div id="imgs-layer" class="layer">
-                                <div class="filter__div">
-                                    <img class="filter" src="/gallery/Download-Cat-PNG-Transparent-Image.png" width="150" height="113.5">
-                                </div>
-                                <div class="filter__div">
-                                    <img class="filter" src="/gallery/balls-layer1.png" width="1024" height="600">
-                                </div>
-                                <div class="filter__div">
-                                    <img class="filter" src="/gallery/border1.png" width="220" height="220">
-                                </div>
-                            </div>
                         </div>
+
                         <%if(isAuth) {%>
                             <div class="box__actions">
-                                <button class="btn" id="capture">Capture</button>
                                 <input class="btn" type="file" id="file-input" accept="image/*;capture=user">
+                                <button class="btn" id="capture">Capture</button>
+                                <button id="clear-button" class="btn">Clear</button>
                                 <%if (edit){%>
                                     <button class="btn" id="update-img">Update</button>
                                     <%} else {%>
@@ -55,14 +63,12 @@
                         <%for(let i of imgs){%>
                             <div>
                                 <img src="https://image.flaticon.com/icons/svg/149/149147.svg" title="delete" class="del_img">
-                                <img src=<%=` data:image/png;base64,${i.path} `%> class="thumbnail" id=
-                                <%=i.id%> alt=
-                                    <%=i.fname%>>
+                                <img style="filter:<%=i.meta%>" src="data:image/png;base64,<%=i.path%>" class="thumbnail" id="<%=i.id%>" alt="<%=i.fname%>">
                             </div>
                             <%}%>
                     </aside>
                 </main>
             </div>
             <script src="/js/editing.js" type="module"></script>
-            <script src="/js/capture.js" type="module"></script>
+            <script src="/js/gallery.js" type="module"></script>
             <%-include('includes/end')%>

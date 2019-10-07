@@ -11,14 +11,14 @@ module.exports = class Images {
         this.fname = imgInfos.fname;
         this.path = imgInfos.path;
         this.modification = imgInfos.modification;
+        this.filter = imgInfos.filter;
     }
 
     save() {
         const sql = `INSERT INTO images
-			(id, user_id, fname, path, modif_date)
-			VALUES(?, ?, ?, ?, CURRENT_TIMESTAMP())`
-        return db.execute(sql, [this.imgId, this.uId, this.fname, this.path]);
-
+			(id, user_id, fname, path, meta, modif_date)
+			VALUES(?, ?, ?, ?, ?, CURRENT_TIMESTAMP())`
+        return db.execute(sql, [this.imgId, this.uId, this.fname, this.path, this.filter]);
     }
 
     static fetchByUser(userId) {

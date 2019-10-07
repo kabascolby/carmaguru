@@ -75,6 +75,12 @@ module.exports = class User {
 			WHERE id=?`;
         return db.execute(sql, [firstname, lastname, username, email, userId]);
     }
+
+    static duplicated(username) {
+        let sql = `SELECT * FROM users WHERE username=? LIMIT 2`;
+        return db.execute(sql, [username]);
+    }
+
     static fetchAll() {
         return db.execute(`SELECT * FROM users`);
     }

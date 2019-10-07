@@ -5,7 +5,6 @@ const fsPromises = fs.promises;
 const ImageClass = require('../models/imagesDb');
 const path = require('path');
 const create_UUID = require('../utility/util').create_UUID;
-// const tempId = 'd3a9a91e-d4ed-11e9-85d5-0242ac110002';
 
 // create unique identifer of an image
 
@@ -23,60 +22,56 @@ exports.getGallery = (req, res, next) => {
 
 exports.postImages = (req, res, next) => {
 
-    /*
-	TODO: return the username form the cookies 
-	*/
+    let data = req.body.data;
+    const filter = req.body.filter;
+    const name = 'img' + (Math.random().toString()).replace('0.', '') + '.png';
 
-    var buff = [];
+    var imgPath = path.join(
+        path.dirname(process.mainModule.filename),
+        'data',
+        'img',
+        name
+    );
 
-    req.on('data', (chunk) => {
-        buff.push(chunk);
-    })
+    data = data.split(';base64,').pop();
 
-    req.on('end', () => {
 
-        var imgPath = path.join(
-            path.dirname(process.mainModule.filename),
-            'data',
-            'img',
-            `img${Math.random(4).toString()}`.replace('0.', '') + '.png'
-        );
 
-        buff = Buffer.concat(buff).toString();
-        buff = JSON.parse(buff);
-        buff.data = buff.data.split(';base64,').pop();
+    createImg(data, imgPath, (data => {
+        if (data === null) {
+            return res.send(null);
+        }
 
-        createImg(buff.data, imgPath, (data => {
-            delete buff.data;
-            if (data === null) {
-                console.log('error----------------->')
-                return res.send(null);
-            }
+        const imgInfos = {
+            imgId: create_UUID(),
+            userId: req.session.userId,
+            modification: Date.now(),
+            path: imgPath,
+            fname: name,
+            filter
+        }
+        const imagesDb = new ImageClass(imgInfos);
+        imagesDb.save()
+            .then(([data]) => {
+                if (!data.warningStatus) {
+                    res.json({
+                        id: imgInfos.imgId,
+                        fname: imgInfos.fname
+                    });
+                } else {
+                    res.json('Server error try later');
+                }
+            })
+            .catch(e => console.log(e));
+    }));
 
-            const imgInfos = {
-                imgId: create_UUID(),
-                userId: req.session.userId,
-                modification: Date.now(),
-                path: imgPath,
-                fname: buff.status === 1 ? //save the filename later
-                    'img' + (Math.random().toString()).replace('0.', '') + '.png' : buff.name
-            }
 
-            const imagesDb = new ImageClass(imgInfos);
-            imagesDb.save()
-                .then((data, fieldData) => {
-                    if (!data[0].warningStatus) {
-                        res.send({
-                            id: imgInfos.imgId,
-                            fname: imgInfos.fname
-                        });
-                    } else {
-                        res.send(null);
-                    }
-                })
-                .catch(e => console.log(e));
-        }));
-    });
+
+
+
+
+
+
 };
 
 exports.putImageUpdate = (req, res, next) => {
@@ -109,23 +104,15 @@ exports.putImageUpdate = (req, res, next) => {
 
 exports.deleteImage = (req, res, next) => {
 
-    var buff = [];
-    req.on('data', (chunk) => {
-        buff.push(chunk);
+    const id = req.body.id;
+    ImageClass.deleteImg(req.session.userId, id, delPromises => {
+        Promise.all(delPromises)
+            .then(([data, fieldData]) => {
+                res.send({});
+            })
+            .catch(e => console.error(new Error('Failed to delete in the DataBase', e)));
     })
 
-    req.on('end', () => {
-        buff = Buffer.concat(buff).toString();
-        buff = JSON.parse(buff);
-        ImageClass.deleteImg(req.session.userId, buff.id, delPromises => {
-            Promise.all(delPromises)
-                .then(([data, fieldData]) => {
-                    // console.log('--------------data----------->\n', data); /* It's possible to return the path here */
-                    res.send({});
-                })
-                .catch(e => console.error(new Error('Failed to delete in the DataBase', e)));
-        })
-    });
 };
 
 
